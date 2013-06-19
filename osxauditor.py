@@ -202,7 +202,7 @@ def VTLookup():
 			PrintAndLog(Ret["md5"] +" "+ Ret["scan_date"] +" "+ str(Ret["positives"]) +"/"+ str(Ret["total"]), "IMPORTANT")
 		else:
 			PrintAndLog(Hash +" "+ "Never seen" +" "+ "0/0", "INFO")
-		time.sleep(16)															# VirusTotal public API is limited to at most 4 requests of any nature in any given 1 minute time frame. Remove this line if you have a private API key. See https://www.virustotal.com/fr/documentation/public-api/
+		time.sleep(16)															# VirusTotal public API is limited to at most 4 requests of any nature in any given 1 minute time frame. Remove this line if you have a private API key. See https://www.virustotal.com/en/documentation/public-api/
 
 def LocalLookup(hashdbpath):
 	global LOCAL_HASHES_DB
@@ -506,7 +506,7 @@ def ParseKext():
 				except:
 					PrintAndLog("Something was wrong with " + FilePath, "WARNING")
 			else:
-				PrintAndLog("Something was wrong with " + Kextension + ". Couldn\'t fint the CFBundleExecutable key in Info.plist\n", "WARNING")
+				PrintAndLog("Something was wrong with " + Kextension + ". Couldn\'t find the CFBundleExecutable key in Info.plist\n", "WARNING")
 	
 def Main():
 	
