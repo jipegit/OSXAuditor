@@ -223,7 +223,7 @@ def LocalLookup(hashdbpath):
 def ParseQuarantines():
 	PrintAndLog("Quarantine artifacts", "SECTION")
 	
-	for User in os.listdir(ROOT_PATH + "Users/"):
+	for User in os.listdir(os.path.join(ROOT_PATH + "Users/")):
 		if User[0] != ".":
 			PrintAndLog(User +"\'s Quarantine artifacts", "SUBSECTION")
 			DbPath = os.path.join(ROOT_PATH + "Users/" + User + "/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2")
@@ -337,7 +337,7 @@ def DumpSQLiteDb(SQLiteDbPath):
 			
 		DbConnection.close()
 	else:
-		PrintAndLog(DbPath + "not found\n", "WARNING")
+		PrintAndLog(SQLiteDbPath + "not found\n", "WARNING")
 
 def ParseFirefoxProfile(User, Profile):
 	PrintAndLog(User +"\'s Firefox profile artifacts (" +Profile+ ")", "SECTION")
