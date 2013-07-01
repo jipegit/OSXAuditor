@@ -1,11 +1,6 @@
-################################################################################################################
-#                                                                                                              #
-#                                            OS X Auditor by @Jipe_                                            #
-#                                                                                                              #
-#  This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.   #
-#                                                                                                              #
-#                                                                                                              #
-################################################################################################################
+#
+#  Local malicious hashes database from OS X Auditor
+#
 7364058a360ca4365862568607a68fde OSX/TrojanBitcoinMiner 
 193113f99f447c9451ff573ccb5d508a OSX/SMSSend_VKMusic
 5d46cdbfd3b193dbd0e5e41e746d54f1 OSX/SMSSend_VKMusic
