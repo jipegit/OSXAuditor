@@ -35,7 +35,6 @@ Finally, the results can be:
 
 Jean-Philippe Teissier - @Jipe_ 
 
-
 ## How to install
 
 Just copy all files from github
@@ -57,34 +56,6 @@ OS X Auditor runs well with python >= 2.7.2. It does not run with a different ve
 
 python osxauditor.py -h
 
-Options:
-  --version             show program's version number and exit
-  -h, --help            show this help message and exit
-  -p ROOTPATH, --path=ROOTPATH
-                        Path to the OS X system to audit (e.g. /mnt/xxx). The
-                        running system will be audited if not specified
-  -t TXTLOGFILE, --txtoutput=TXTLOGFILE
-                        Path to the txt output log file
-  -H HTMLLOGFILE, --htmloutput=HTMLLOGFILE
-                        Path to the HTML output log file
-  -z ZIPLOGSFILE, --ziplogs=ZIPLOGSFILE
-                        Create a zip file containing all system and users'
-                        logs. Path to directory to put the zip file in
-  -S SYSLOGSERVER, --syslog=SYSLOGSERVER
-                        Syslog server to send the report to
-  -a, --all             Analyse all artifacts (equal to -qsdbk)
-  -q, --quarantines     Analyse quarantined artifacts
-  -s, --startup         Analyse startup agents and daemons artifacts
-  -d, --downloads       Analyse downloaded files artifacts
-  -b, --browsers        Analyse browsers (Safari, FF & Chrome) artifacts
-  -k, --kext            Analyse kernel extensions (kext) artifacts
-  -m, --mrh             Perform a reputation lookup in Team Cymru's MRH
-  -u, --malwarelu       Perform a reputation lookup in Malware.lu database
-  -v, --virustotal      Perform a lookup in VirusTotal database.
-  -l LOCALDATABASE, --localhashesdb=LOCALDATABASE
-                        Path to a local database of suspicious hashes to
-                        perform a lookup in
-
 ## Changelog
 
 ### 0.2 
@@ -100,7 +71,6 @@ Options:
  * CHANGE: a small change with the Bootstrap CSS 
  * CHANGE: the VirusTotal lookup is now done in a bulk mode
  * FIX: a bug in ParseLaunchAgents() on plist files containing both Program and ProgramArguments keys
- 
 
 ### 0.1
  * Initial Release
