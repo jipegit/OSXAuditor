@@ -2,7 +2,7 @@
 
 OS X Auditor is a free Mac OS X computer forensics tool.
 
-It does parse and hash the following artifacts on the running system or a copy of a system you want to analyze:
+OS X Auditor parses and hashes the following artifacts on the running system or a copy of a system you want to analyze:
  * the kernel extensions
  * the system agents and daemons
  * the third parties' agents and daemons
