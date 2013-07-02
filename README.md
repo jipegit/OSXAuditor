@@ -13,7 +13,7 @@ It does parse and hash the following artifacts on the running system or a copy o
  * the users' Safari history, downloads, topsites, databases and HTML5 localstore
  * the users' Firefox cookies, downloads, formhistory, permissions, places and  signons
 
-It also look for suspicious keywords in the .plist themselves.
+It also looks for suspicious keywords in the .plist themselves.
  
 It can verify the reputation of each file on:
  * Team Cymru's MHR 
@@ -21,7 +21,7 @@ It can verify the reputation of each file on:
  * Malware.lu
  * your own local database
 
-It can aggregate all logs from the following location in a zipball:
+It can aggregate all logs from the following directories into a zipball:
  * /var/log (-> /private/var/log)
  * /Library/logs
  * the user's ~/Library/logs
@@ -41,10 +41,10 @@ Just copy all files from github
 
 ## Dependencies
 
-If you run OS X Auditor on a Mac. You will get a full plist parsing support:
+If you plan to run OS X Auditor on a Mac. You will get a full plist parsing support:
  * pip install pyobjc 
 
-If you can't install pyobjc or if you run OS X Auditor on another OS than Mac OS X. You may experience some troubles with the plist parsing:
+If you can't install pyobjc or if you plan to run OS X Auditor on another OS than Mac OS X (You may experience some troubles with the plist parsing):
  * pip install biplist
  * pip install plist
 
