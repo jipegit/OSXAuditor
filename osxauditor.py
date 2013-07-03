@@ -45,6 +45,7 @@ import time
 import json
 import zipfile
 import codecs 													#binary plist parsing does not work well in python3.3 so we are stuck in 2.7 for now
+from functools import partial
 
 try:
 	from urllib.request import urlopen							#python3
@@ -255,7 +256,7 @@ def VTLookup():
 		else:
 			PrintAndLog("Got a weird answer from Virustotal\n", "ERROR")
 
-def LocalLookup(hashdbpath):
+def LocalLookup(HashDBPath):
 	""" Perform of lookup in a local database """
 
 	global LOCAL_HASHES_DB
@@ -263,7 +264,7 @@ def LocalLookup(hashdbpath):
 	PrintAndLog("Local Hashes database lookup", "SECTION")
 	PrintAndLog("Got %s hashes to verify" % len(HASHES), "DEBUG")
 
-	with open(hashdbpath, 'r') as f:
+	with open(HashDBPath, 'r') as f:
 		Data = f.readlines()
 		for Line in Data:
 			if Line[0] != "#":
@@ -275,6 +276,19 @@ def LocalLookup(hashdbpath):
 	for Hash in HASHES:
 		if Hash in LOCAL_HASHES_DB:
 			PrintAndLog(Hash +" "+ LOCAL_HASHES_DB[Hash], "WARNING")
+
+def BigFileMd5(FilePath):
+	""" Return the md5 hash of a big file """
+	
+	Md5 = hashlib.md5()
+	try:
+		with open(FilePath, 'rb') as f:
+			for Chunk in iter(partial(f.read, 1048576), ''):
+				Md5.update(Chunk)
+	except:
+		PrintAndLog("Cannot hash %s \n" % FilePath, "ERROR")
+		return False
+	return Md5.hexdigest()
 
 def UniversalReadPlist(PlistPath):
 	""" Try to read a plist depending of the plateform and the available libs. Good luck Jim... """
@@ -330,7 +344,6 @@ def ParseQuarantines():
 			else:
 				PrintAndLog("No quarantined files for user " + User + "\n", "INFO")
 				continue
-
 			DbConnection = sqlite3.connect(DbPath)
 			DbCursor = DbConnection.cursor()
 			LSQuarantineEvents = DbCursor.execute("SELECT * from LSQuarantineEvent")
@@ -355,15 +368,10 @@ def ParseStartupItems (StartupItemsPath):
 		if StartupItemsPlist:
 			if "Provides" in StartupItemsPlist:
 				FilePath = os.path.join(StartupItemsPath + StartupItems + "/" + StartupItemsPlist["Provides"][0])
-				try:
-					with open(FilePath, 'rb')	as f:	
-						data = f.read()
-						Md5 = hashlib.md5(data).hexdigest()
-						HASHES.append(Md5)
-						PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
-				except (IOError):
-					PrintAndLog("Cannot open %s \n" % FilePath, "ERROR")
-
+				Md5 = BigFileMd5(FilePath)
+				if Md5:
+					HASHES.append(Md5)
+					PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
 
 def ParseLaunchAgents(AgentsPath):
 	""" Parse a LanchAgent plist and hash its program argument. Also look for suspicious keywords in the plist itself """
@@ -380,28 +388,20 @@ def ParseLaunchAgents(AgentsPath):
 		if LaunchAgentPlist:
 			if "Program" in LaunchAgentPlist and "Label" in LaunchAgentPlist:
 				FilePath = LaunchAgentPlist["Program"]
-				try:
-					with open(FilePath, 'rb') as f:
-						data = f.read()
-						Md5 = hashlib.md5(data).hexdigest()
-						HASHES.append(Md5)
-						PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
-				except (IOError):
-					PrintAndLog("Cannot open %s \n" % FilePath, "ERROR")
+				Md5 = BigFileMd5(FilePath)
+				if Md5:
+					HASHES.append(Md5)
+					PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
 				continue
 			if "ProgramArguments" in LaunchAgentPlist and "Label" in LaunchAgentPlist:
 				FilePath = LaunchAgentPlist["ProgramArguments"][0]
-				try:
-					with open(FilePath, 'rb')	as f:	
-						data = f.read()
-						Md5 = hashlib.md5(data).hexdigest()
-						HASHES.append(Md5)
-						PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
-						if len(LaunchAgentPlist["ProgramArguments"]) >= 3:
-							if any(x in LaunchAgentPlist["ProgramArguments"][2] for x in SuspiciousPlist):
-								PrintAndLog(LaunchAgentPlist["ProgramArguments"][2]+" in " + LaunchAgentPlistpath + " looks suspicious", "WARNING")
-				except (IOError):
-					PrintAndLog("Cannot open %s \n" % FilePath, "ERROR")
+				Md5 = BigFileMd5(FilePath)
+				if Md5:
+					HASHES.append(Md5)
+					PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
+				if len(LaunchAgentPlist["ProgramArguments"]) >= 3:
+					if any(x in LaunchAgentPlist["ProgramArguments"][2] for x in SuspiciousPlist):
+						PrintAndLog(LaunchAgentPlist["ProgramArguments"][2]+" in " + LaunchAgentPlistpath + " looks suspicious", "WARNING")
 			
 def ParseStartup():
 	""" Parse the different LauchAgents and LaunchDaemons artifacts """
@@ -450,9 +450,8 @@ def ParseDownloads():
 			for Root, Dirs, Files in os.walk(DlUserPath):
 				for File in Files:
 					FilePath = os.path.join(Root, File)
-					with open(FilePath, "rb") as f:
-						data = f.read()
-						Md5 = hashlib.md5(data).hexdigest()
+					Md5 = BigFileMd5(FilePath)
+					if Md5:
 						HASHES.append(Md5)
 						PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
 	
@@ -607,13 +606,10 @@ def ParsePackagesDir(PackagesDirPath):
 		if PackagePlist:
 			if "CFBundleExecutable" in PackagePlist:
 				FilePath = os.path.join(PackagesDirPath + PackagePath + CFBundleExecutablepath + PackagePlist["CFBundleExecutable"])
-				try:
-					with open(FilePath, 'rb') as f:
-						data = f.read()
-						Md5 = hashlib.md5(data).hexdigest()
-						PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
-				except:
-					PrintAndLog("Cannot open " + FilePath, "ERROR")
+				Md5 = BigFileMd5(FilePath)
+				if Md5:
+					HASHES.append(Md5)
+					PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
 			else:
 				PrintAndLog("Cannot find the CFBundleExecutable key in " + PackagePlistPath + "\'s Info.plist\n", "ERROR")
 
