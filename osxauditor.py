@@ -335,9 +335,9 @@ def ParseQuarantines():
 			DbCursor = DbConnection.cursor()
 			LSQuarantineEvents = DbCursor.execute("SELECT * from LSQuarantineEvent")
 			for LSQuarantineEvent in LSQuarantineEvents:
-				JointLSQuarantineEvent = ""
+				JointLSQuarantineEvent = u""
 				for Q in LSQuarantineEvent:
-					JointLSQuarantineEvent += ";" + str(Q)
+					JointLSQuarantineEvent += u";" + unicode(Q)
 				PrintAndLog(JointLSQuarantineEvent[1:]+"\n", "INFO")
 			DbConnection.close()
 
@@ -433,7 +433,7 @@ def ParseStartup():
 	PrintAndLog("Deprecated third party StartupItems artifacts", "SUBSECTION")
 	ParseStartupItems(os.path.join(ROOT_PATH + "Library/StartupItems/"))
 	
-	PrintAndLog("Users\' Agents artifacts", "SECTION")
+	PrintAndLog("Users\' Agents artifacts", "SUBSECTION")
 	for User in os.listdir("/Users/"):
 		if User[0] != "." and os.path.isdir("/users/" + User + "/Library/LaunchAgents/"):
 			PrintAndLog(User +"\'s Agents artifacts", "SUBSECTION")
