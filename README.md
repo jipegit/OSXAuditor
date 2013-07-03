@@ -58,6 +58,10 @@ python osxauditor.py -h
 
 ## Changelog
 
+### 0.2.1
+ * CHANGE/FIX: Implement a BigFileMd5() function to hash very big files, avoid MemoryError and reduce the memory footprint
+ * FIX: UTF-8 entries from LSQuarantineEvent in ParseQuarantines()
+
 ### 0.2 
  * NEW: ability to send the results to a remote syslogd server (-S)
  * NEW: ability to create a zipball of all the log files found on the audited system (-z)

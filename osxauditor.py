@@ -9,7 +9,7 @@
 
 __description__ = 'OS X Auditor'
 __author__ = '@Jipe_'
-__version__ = '0.2'
+__version__ = '0.2.1'
 
 ROOT_PATH = "/"
 HASHES = []
