@@ -9,7 +9,7 @@
 
 __description__ = 'OS X Auditor'
 __author__ = '@Jipe_'
-__version__ = '0.2.1'
+__version__ = '0.3'
 
 ROOT_PATH = "/"
 HASHES = []
@@ -30,6 +30,9 @@ MRH_PORT = 43
 MALWARE_LU_HOST = "https://www.malware.lu/api/check"
 MALWARE_LU_API_KEY = ""											#Put your malware.lu API key here
 
+GEOLOCATE_WIFI_AP = False
+GEOMENA_API_HOST = "http://geomena.org/ap/"
+
 VT_HOST = "https://www.virustotal.com/vtapi/v2/file/report"
 VT_API_KEY  = ""												#Put your VirusTotal API key here
 
@@ -46,6 +49,7 @@ import json
 import zipfile
 import codecs 													#binary plist parsing does not work well in python3.3 so we are stuck in 2.7 for now
 from functools import partial
+import re
 
 try:
 	from urllib.request import urlopen							#python3
@@ -94,7 +98,7 @@ def HTMLLog(LogStr, TYPE):
 	
 	if TYPE == "INFO":
 		Splitted = LogStr.split(" ")
-		if len(Splitted[0]) == 32:	
+		if re.match("[a-f\d]{32}", Splitted[0]):					#Should be a md5
 			Link = "<a href=\"https://www.virustotal.com/fr/file/" + Splitted[0] + "/analysis/\">" + Splitted[0] + "</a> "
 			HTML_LOG_FILE.write("<i class='icon-file'></i> " + Link + " ".join(Splitted[1:]).decode("utf-8") + "<br />")
 		else:
@@ -201,18 +205,18 @@ def MlwrluLookup():
 
 	for Hash in HASHES:
 		try:
-			param = { 'hash': Hash, 'apikey': MALWARE_LU_API_KEY }
-			data = urllib.urlencode(param)
-			f = urllib2.urlopen(MALWARE_LU_HOST, data)
-			data = f.read()	
+			Params = { 'hash': Hash, 'apikey': MALWARE_LU_API_KEY }
+			UrlEncodedParams = urllib.urlencode(Params)
+			F = urllib2.urlopen(MALWARE_LU_HOST, UrlEncodedParams)
+			Data = F.read()	
 	 	
 		except (urllib2.HTTPError, e):
 			if e.code == 401:
-				PrintAndLog("Wrong Malware.lu api key", "WARNING") 
+				PrintAndLog("Wrong Malware.lu api key", "ERROR") 
 			else:
-				PrintAndLog("Malware.lu error "+str(e.code)+" "+str(e.reason), "WARNING")
+				PrintAndLog("Malware.lu error "+str(e.code)+" "+str(e.reason), "ERROR")
 	
-		Ret = json.loads(data)
+		Ret = json.loads(Data)
 		
 		if Ret["status"]:
 			PrintAndLog(Hash +" "+ "N/A "+ Ret["stats"], "WARNING")
@@ -358,6 +362,7 @@ def ParseStartupItems (StartupItemsPath):
 	""" Parse the StartupItems plist and hash its program argument """
 
 	StartupItemsPlist = False
+	NbStartupItems = 0
 	
 	for StartupItems in os.listdir(StartupItemsPath):
 		StartupItemsPlistPath = os.path.join(StartupItemsPath + StartupItems + "/StartupParameters.plist")
@@ -370,8 +375,12 @@ def ParseStartupItems (StartupItemsPath):
 				FilePath = os.path.join(StartupItemsPath + StartupItems + "/" + StartupItemsPlist["Provides"][0])
 				Md5 = BigFileMd5(FilePath)
 				if Md5:
-					HASHES.append(Md5)
+					if Md5 not in HASHES: 
+						HASHES.append(Md5)
 					PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
+		NbStartupItems += 1
+	if NbStartupItems == 0:
+		PrintAndLog(StartupItemsPath + " is empty", "INFO")
 
 def ParseLaunchAgents(AgentsPath):
 	""" Parse a LanchAgent plist and hash its program argument. Also look for suspicious keywords in the plist itself """
@@ -379,6 +388,7 @@ def ParseLaunchAgents(AgentsPath):
 	SuspiciousPlist = ["exec", "socket" ,"open", "connect"]
 	LaunchAgentPlist = False
 	
+	NbLaunchAgents = 0
 	for LaunchAgent in os.listdir(AgentsPath):
 		LaunchAgentPlistpath = os.path.join(AgentsPath + LaunchAgent)
 		
@@ -390,18 +400,24 @@ def ParseLaunchAgents(AgentsPath):
 				FilePath = LaunchAgentPlist["Program"]
 				Md5 = BigFileMd5(FilePath)
 				if Md5:
-					HASHES.append(Md5)
+					if Md5 not in HASHES: 
+						HASHES.append(Md5)
 					PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
 				continue
 			if "ProgramArguments" in LaunchAgentPlist and "Label" in LaunchAgentPlist:
 				FilePath = LaunchAgentPlist["ProgramArguments"][0]
 				Md5 = BigFileMd5(FilePath)
 				if Md5:
-					HASHES.append(Md5)
+					if Md5 not in HASHES: 
+						HASHES.append(Md5)
 					PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
 				if len(LaunchAgentPlist["ProgramArguments"]) >= 3:
 					if any(x in LaunchAgentPlist["ProgramArguments"][2] for x in SuspiciousPlist):
 						PrintAndLog(LaunchAgentPlist["ProgramArguments"][2]+" in " + LaunchAgentPlistpath + " looks suspicious", "WARNING")
+		NbLaunchAgents += 1
+		
+	if NbLaunchAgents == 0:
+		PrintAndLog(AgentsPath + " is empty", "INFO")
 			
 def ParseStartup():
 	""" Parse the different LauchAgents and LaunchDaemons artifacts """
@@ -439,51 +455,90 @@ def ParseStartup():
 			PrintAndLog(User +"\'s Agents artifacts", "SUBSECTION")
 			ParseLaunchAgents(os.path.join("/Users/" + User + "/Library/LaunchAgents/"))
 
+def HashDir(Title, Path):
+	""" Hash a direrctory and add the hashes"""
+	PrintAndLog(Title, "SUBSECTION")
+	
+	NbFiles = 0
+	for Root, Dirs, Files in os.walk(Path):
+		for File in Files:
+			FilePath = os.path.join(Root, File)
+			Md5 = BigFileMd5(FilePath)
+			if Md5:
+				if Md5 not in HASHES:
+					HASHES.append(Md5)
+				PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
+			NbFiles += 1
+	
+	if NbFiles == 0:
+		PrintAndLog(Path + " is empty", "INFO")
+
 def ParseDownloads():
 	""" Hash all users\' downloaded files """
 
 	PrintAndLog("Users\' Downloads artifacts", "SECTION")
 	for User in os.listdir(ROOT_PATH + "Users/"):
-		DlUserPath = ROOT_PATH + "Users/" + User + "/Downloads/"
-		if User[0] != "." and os.path.isdir(DlUserPath):
-			PrintAndLog(User +"\'s Downloads artifacts", "SUBSECTION")
-			for Root, Dirs, Files in os.walk(DlUserPath):
-				for File in Files:
-					FilePath = os.path.join(Root, File)
-					Md5 = BigFileMd5(FilePath)
-					if Md5:
-						HASHES.append(Md5)
-						PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
+		if User[0] != ".":
+			DlUserPath = os.path.join(ROOT_PATH + "Users/" + User + "/Downloads/")
+			if os.path.isdir(DlUserPath): 
+				HashDir(User + "\'s Downloads artifacts", DlUserPath)
+			else:
+				PrintAndLog(DlUserPath + " does not exist", "DEBUG")
+			OldEmailUserPath = os.path.join(ROOT_PATH + "Users/" + User + "/Library/Mail Downloads/")
+			if os.path.isdir(OldEmailUserPath): 
+				HashDir(User + "\'s Old email downloads artifacts", OldEmailUserPath)
+			else:
+				PrintAndLog(OldEmailUserPath + " does not exist", "DEBUG")
+			EmailUserPath = os.path.join(ROOT_PATH + "Users/" + User + "/Library/Containers/com.apple.mail/Data/Library/Mail Downloads")
+			if os.path.isdir(EmailUserPath):
+				HashDir(User + "\'s Email downloads artifacts", EmailUserPath)
+			else:
+				PrintAndLog(EmailUserPath + " does not exist", "DEBUG")			
 	
 def DumpSQLiteDb(SQLiteDbPath):
 	""" Dump a SQLite database file """
 
-	PrintAndLog(SQLiteDbPath, "SECTION")
+	PrintAndLog(SQLiteDbPath, "DEBUG")
 	if os.path.isfile(SQLiteDbPath):
-		DbConnection = sqlite3.connect(SQLiteDbPath)
-		DbCursor = DbConnection.cursor()
-		DbCursor.execute("SELECT * from sqlite_master WHERE type = 'table'")
-		Tables =  DbCursor.fetchall()
-		for Table in Tables:
-			PrintAndLog("Table " +Table[2], "SUBSECTION")
-			DbCursor.execute("SELECT * from " + Table[2])
-			Rows = DbCursor.fetchall()
-			for Row in Rows:
-				PrintAndLog(str(Row), "INFO")
-		DbConnection.close()
+		try:
+			DbConnection = sqlite3.connect(SQLiteDbPath)
+			DbCursor = DbConnection.cursor()
+			DbCursor.execute("SELECT * from sqlite_master WHERE type = 'table'")
+			Tables =  DbCursor.fetchall()
+			for Table in Tables:
+				PrintAndLog("Table " +Table[2], "SUBSECTION")
+				DbCursor.execute("SELECT * from " + Table[2])
+				Rows = DbCursor.fetchall()
+				if len(Rows) == 0:
+					PrintAndLog("Table " + Table[2] + " is empty", "INFO")
+				else:
+					for Row in Rows:
+						PrintAndLog(str(Row), "INFO")
+			DbConnection.close()
+		except Exception as e:
+			PrintAndLog("Error with " + SQLiteDbPath + ": " + str(e.args), "ERROR")
 	else:
-		PrintAndLog(SQLiteDbPath + "not found\n", "ERROR")
+		PrintAndLog(SQLiteDbPath + " not found\n", "ERROR")
 
 def ParseFirefoxProfile(User, Profile):
 	""" Parse the different SQLite databases in a Firefox profile """
 
 	PrintAndLog(User +"\'s Firefox profile artifacts (" +Profile+ ")", "SECTION")
+	
+	#Most useful artifacts. See http://kb.mozillazine.org/Profile_folder_-_Firefox
 	DumpSQLiteDb(os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile, "cookies.sqlite"))
 	DumpSQLiteDb(os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile, "downloads.sqlite"))
 	DumpSQLiteDb(os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile, "formhistory.sqlite"))
-	DumpSQLiteDb(os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile, "permissions.sqlite"))
 	DumpSQLiteDb(os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile, "places.sqlite"))
 	DumpSQLiteDb(os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile, "signons.sqlite"))
+	
+	#Secondary artifacts
+	DumpSQLiteDb(os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile, "permissions.sqlite"))
+	DumpSQLiteDb(os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile, "addons.sqlite"))
+	DumpSQLiteDb(os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile, "extensions.sqlite"))
+	DumpSQLiteDb(os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile, "content-prefs.sqlite"))
+	DumpSQLiteDb(os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile, "healthreport.sqlite"))
+	DumpSQLiteDb(os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile, "webappsstore.sqlite"))
 
 def ParseFirefox():
 	""" Walk in all users' FireFox profiles and call ParseFirefoxProfile() """
@@ -491,7 +546,7 @@ def ParseFirefox():
 	PrintAndLog("Users\' Firefox artifacts", "SECTION")
 	for User in os.listdir(ROOT_PATH + "Users/"):
 		if User[0] != "." and os.path.isdir(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles"):
-			PrintAndLog(User +"\'s Firefox artifacts", "SUBSECTION")
+			PrintAndLog(User +"\'s Firefox artifacts", "SECTION")
 			for Profile in os.listdir(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles"):
 				if Profile[0] != "." and os.path.isdir(ROOT_PATH + "Users/" + User + "/Library/Application Support/Firefox/Profiles/" + Profile):
 					ParseFirefoxProfile(User, Profile)
@@ -549,11 +604,11 @@ def ParseSafariProfile(User, Path):
 				str += T["TopSiteURLString"] + "\n"	
 				PrintAndLog(str , "INFO")
 	
-	PrintAndLog(User + "\'s Safari Databases Artifacts", "SECTION")
+	PrintAndLog(User + "\'s Safari Databases Artifacts", "SUBSECTION")
 	for Db in os.listdir(os.path.join(Path + "/Databases/")):
 		DumpSQLiteDb(os.path.join(Path + "/Databases/" + Db))
 	
-	PrintAndLog(User + "\'s Safari LocalStorage Artifacts", "SECTION")
+	PrintAndLog(User + "\'s Safari LocalStorage Artifacts", "SUBSECTION")
 	for Db in os.listdir(os.path.join(Path + "/LocalStorage/")):
 		DumpSQLiteDb(os.path.join(Path + "/LocalStorage/" + Db))
 
@@ -564,26 +619,56 @@ def ParseSafari():
 			PrintAndLog(User +"\'s Safari artifacts", "SECTION")
 			ParseSafariProfile(User, os.path.join(ROOT_PATH + "Users/" + User + "/Library/Safari"))
 
+def ParseChromeProfile(User, Path):
+	""" Parse the different SQLite databases in a Chrome profile """
+
+	PrintAndLog(User + "\'s Chrome Artifacts", "SUBSECTION")
+
+	PrintAndLog(User + "\'s Chrome History", "SUBSECTION")
+	DumpSQLiteDb(os.path.join(Path + "/History"))
+
+	PrintAndLog(User + "\'s Chrome Cookies", "SUBSECTION")
+	DumpSQLiteDb(os.path.join(Path + "/Cookies"))
+
+	PrintAndLog(User + "\'s Chrome Login Data", "SUBSECTION")
+	DumpSQLiteDb(os.path.join(Path + "/Login Data"))
+
+	PrintAndLog(User + "\'s Chrome Top Sites", "SUBSECTION")
+	DumpSQLiteDb(os.path.join(Path + "/Top Sites"))
+
+	PrintAndLog(User + "\'s Chrome Web Data", "SUBSECTION")
+	DumpSQLiteDb(os.path.join(Path + "/Web Data"))
+	
+	PrintAndLog(User + "\'s Chrome databases", "SUBSECTION")
+	for Db in os.listdir(os.path.join(Path + "/databases/")):
+		CurrentDbPath = os.path.join(Path + "/databases/" + Db)
+		if CurrentDbPath[-8:] != "-journal" and not os.path.isdir(CurrentDbPath):
+			DumpSQLiteDb(CurrentDbPath)
+
+	PrintAndLog(User + "\'s Chrome local storage", "SUBSECTION")
+	for Db in os.listdir(os.path.join(Path + "/Local Storage/")):
+		CurrentDbPath = os.path.join(Path + "/Local Storage/" + Db)
+		if CurrentDbPath[-8:] != "-journal" and not os.path.isdir(CurrentDbPath):
+			DumpSQLiteDb(CurrentDbPath)
+
 def ParseChrome():
 	""" Parse the different files in a Chrome profile """
 
 	PrintAndLog("Users\' Chrome artifacts", "SECTION")
-	PrintAndLog("Not implemented yet", "DEBUG")
-	# TODO
+	for User in os.listdir(os.path.join(ROOT_PATH + "Users/")):
+		UsersChromePath = os.path.join(ROOT_PATH + "Users/" + User + "/Library/Application Support/Google/Chrome/Default")
+		if User[0] != "." and os.path.isdir(UsersChromePath):
+			PrintAndLog(User +"\'s Chrome artifacts", "SECTION")
+			ParseChromeProfile(User, UsersChromePath)
 	
 def ParseBrowsers():
 	""" Call the different functions to parse the browsers artifacts  """
 
 	PrintAndLog("Browsers artifacts", "SECTION")
 
-	PrintAndLog("Safari artifacts", "SECTION")
 	ParseSafari()
-
-	PrintAndLog("Firefox artifacts", "SECTION")
 	ParseFirefox()
-	
-	#PrintAndLog("Chrome artifacts", "SECTION")
-	#ParseChrome()
+	ParseChrome()
 
 def ParsePackagesDir(PackagesDirPath):
 	""" Parse the packages in a directory"""
@@ -591,6 +676,7 @@ def ParsePackagesDir(PackagesDirPath):
 	plistfile = "/Info.plist"
 	PackagePlistPath = ""
 	CFBundleExecutablepath = ""
+	NbPackages = 0
 	
 	for PackagePath in os.listdir(PackagesDirPath):
 		if os.path.isfile(os.path.join(PackagesDirPath + PackagePath + plistfile)):
@@ -608,10 +694,14 @@ def ParsePackagesDir(PackagesDirPath):
 				FilePath = os.path.join(PackagesDirPath + PackagePath + CFBundleExecutablepath + PackagePlist["CFBundleExecutable"])
 				Md5 = BigFileMd5(FilePath)
 				if Md5:
-					HASHES.append(Md5)
+					if Md5 not in HASHES: 
+						HASHES.append(Md5)
 					PrintAndLog(Md5 +" "+ FilePath + " - " + time.ctime(os.path.getctime(FilePath)) + " - " + time.ctime(os.path.getmtime(FilePath))+"\n", "INFO")
 			else:
 				PrintAndLog("Cannot find the CFBundleExecutable key in " + PackagePlistPath + "\'s Info.plist\n", "ERROR")
+		NbPackages += 1
+	if NbPackages == 0:
+		PrintAndLog(PackagesDirPath + " is empty", "INFO")
 
 def ParseKext():
 	""" Parse the Kernel extensions """
@@ -650,12 +740,144 @@ def AggregateLogs(ZipLogsFile):
 	except Exception as e:
 		PrintAndLog("Log files aggregation FAILED " + str(e.args), "ERROR")
 
+def GeomenaApiLocation(Ssid):
+	""" Perform a geolocation query on Geomena"""
+
+	NormalizedSsid = ""
+	Latitude = "Not found"
+	Longitude = "Not found"
+	
+	Ssid = Ssid.split(":")
+	
+	for i in Ssid:
+		if len(i) == 1:
+			i = "0"+i
+		NormalizedSsid += i
+		
+	PrintAndLog("Geomena query for " + "".join(NormalizedSsid), "DEBUG")
+
+	try:
+		F = urllib2.urlopen(GEOMENA_API_HOST+NormalizedSsid)
+		Data = F.read()	
+	except urllib2.HTTPError as e:
+		PrintAndLog("Geomena API error "+str(e.code)+" "+str(e.reason), "ERROR")
+	
+	M = re.match(".+\sLatitude:\s([-\d\.]{1,19})\s.+\sLongitude:\s([-\d\.]{1,19})\s.+", Data, re.DOTALL)
+	if M:
+		Latitude = M.group(1)
+		Longitude = M.group(2)
+		
+	return "Latitude: " + Latitude + " Longitude: " + Longitude
+	
+def ParseAirportPrefs():
+	""" Parse Airport preferences and try to extract geolocation information """
+	
+	global HTML_LOG_FILE
+	AirportPrefPlist = False
+	NbAirportPrefs = 0
+	
+	PrintAndLog("Airport preferences artifacts", "SECTION")
+
+	AirportPrefPlistPath = os.path.join(ROOT_PATH + "Library/Preferences/SystemConfiguration/com.apple.airport.preferences.plist")
+	
+	PrintAndLog(AirportPrefPlistPath, "DEBUG")
+	AirportPrefPlist = UniversalReadPlist(AirportPrefPlistPath)
+	
+	if AirportPrefPlist:
+		if "RememberedNetworks" in AirportPrefPlist:
+			RememberedNetworks = AirportPrefPlist["RememberedNetworks"]
+			for RememberedNetwork in RememberedNetworks:
+				Geolocation = "N/A (Geolocation disabled)"
+				if GEOLOCATE_WIFI_AP:
+					Geolocation = GeomenaApiLocation(RememberedNetwork["CachedScanRecord"]["BSSID"])
+				PrintAndLog("SSID: " + RememberedNetwork["SSIDString"] + " - BSSID: " + RememberedNetwork["CachedScanRecord"]["BSSID"] + " - RSSI: " + str(RememberedNetwork["CachedScanRecord"]["RSSI"]) + " - Last connected: " + str(RememberedNetwork["LastConnected"]) + " - Security type: " + RememberedNetwork["SecurityType"] + " - Geolocation: " + Geolocation, "INFO")
+				NbAirportPrefs += 1
+
+	if NbAirportPrefs == 0:
+		PrintAndLog(AirportPrefPlistPath + " is empty (no WiFi AP saved)", "INFO")
+
+def ParseMailAppAccount(MailAccountPlistPath):
+	""" Parse a Mail Account plist """
+
+	MailAccountPlist = False
+	NbMailAccounts = 0
+	NbSmtpAccounts = 0
+	
+	PrintAndLog(MailAccountPlistPath, "DEBUG")
+
+	MailAccountPlist = UniversalReadPlist(MailAccountPlistPath)
+	
+	if MailAccountPlist:
+		PrintAndLog("Email accounts", "SUBSECTION")
+		if "MailAccounts" in MailAccountPlist:
+			MailAccounts = MailAccountPlist["MailAccounts"]
+			for MailAccount in MailAccounts:
+				MAccountPref = ""
+				if "AccountName" in MailAccount:
+					MAccountPref = "AccountName: " + MailAccount["AccountName"] + " - "
+					if "AccountType" in MailAccount: MAccountPref += "AccountType: " + MailAccount["AccountType"] + " - "
+					if "SSLEnabled" in MailAccount: MAccountPref += "SSLEnabled: " + MailAccount["SSLEnabled"] + " - "
+					if "Username" in MailAccount: MAccountPref += "Username: " + MailAccount["Username"]  + " - "
+					if "Hostname" in MailAccount: MAccountPref += "Hostname: " + MailAccount["Hostname"]  + " - "
+					if "PortNumber" in MailAccount: MAccountPref += "(" + MailAccount["PortNumber"]  + ") - "				
+					if "SMTPIdentifier" in MailAccount: MAccountPref += "SMTPIdentifier: " + MailAccount["SMTPIdentifier"]  + " - "
+					if "EmailAddresses" in MailAccount:
+						for EmailAddresse in MailAccount["EmailAddresses"]:
+							MAccountPref += "EmailAddresse: " + EmailAddresse + " - "
+					PrintAndLog(MAccountPref, "INFO")
+				NbMailAccounts += 1
+			if NbMailAccounts == 0:
+				PrintAndLog("No email account)","INFO")
+		
+		PrintAndLog("SMTP accounts", "SUBSECTION")
+		if "DeliveryAccounts" in MailAccountPlist:
+			DeliveryAccounts = MailAccountPlist["DeliveryAccounts"]
+			for DeliveryAccount in DeliveryAccounts:
+				DAccountPref = ""
+				if "AccountName" in DeliveryAccount:
+					DAccountPref = "AccountName: " + DeliveryAccount["AccountName"] + " - "
+					if "AccountType" in DeliveryAccount: DAccountPref += "AccountType: " + DeliveryAccount["AccountType"] + " - "
+					if "SSLEnabled" in DeliveryAccount: DAccountPref += "SSLEnabled: " + DeliveryAccount["SSLEnabled"] + " - "
+					if "Username" in DeliveryAccount: DAccountPref += "Username: " + DeliveryAccount["Username"]  + " - "
+					if "Hostname" in DeliveryAccount: DAccountPref += "Hostname: " + DeliveryAccount["Hostname"]  + " - "
+					if "PortNumber" in DeliveryAccount: DAccountPref += "(" + MailAccount["PortNumber"]  + ") - "				
+					PrintAndLog(DAccountPref, "INFO")
+				NbSmtpAccounts += 1
+			if NbSmtpAccounts == 0:
+				PrintAndLog("No SMTP account)","INFO")
+	
+	
+			   
+def ParseUsersAccounts():
+	""" Parse users' accounts """
+
+	PrintAndLog("Users\' Social accounts artifacts", "SECTION")
+	for User in os.listdir(os.path.join(ROOT_PATH + "Users/")):
+		UsersAccountPath = os.path.join(ROOT_PATH + "Users/" + User + "/Library/Accounts/Accounts3.sqlite")
+		if User[0] != ".":
+			PrintAndLog(User +"\'s Social account artifacts", "SECTION")
+			if os.path.isfile(UsersAccountPath):
+				DumpSQLiteDb(UsersAccountPath)
+			else:
+				PrintAndLog(User +" has no social account", "INFO")
+
+	PrintAndLog("Users\' Mail.app accounts artifacts", "SECTION")
+	for User in os.listdir(os.path.join(ROOT_PATH + "Users/")):
+		MailAccountPlistPath = os.path.join(ROOT_PATH + "Users/" + User + "/Library/Containers/com.apple.mail/Data/Library/Mail/V2/MailData/Accounts.plist")
+		if User[0] != ".":
+			PrintAndLog(User +"\'s Mail.app accounts artifacts", "SECTION")
+			if os.path.isfile(MailAccountPlistPath):
+				ParseMailAppAccount(MailAccountPlistPath)
+			else:
+				PrintAndLog(User +" has no Mail.app account", "INFO")
+
 def Main():
 	""" Here we go """
 
 	global ROOT_PATH
 	global HTML_LOG_FILE
 	global HOSTNAME
+	global GEOLOCATE_WIFI_AP
 
 	HOSTNAME = socket.gethostname()
 	Euid = str(os.geteuid())
@@ -672,7 +894,11 @@ def Main():
 	Parser.add_option('-s', '--startup', action="store_true", default=False, help='Analyse startup agents and daemons artifacts')
 	Parser.add_option('-d', '--downloads', action="store_true", default=False, help='Analyse downloaded files artifacts')
 	Parser.add_option('-b', '--browsers', action="store_true", default=False, help='Analyse browsers (Safari, FF & Chrome) artifacts')
+	Parser.add_option('-A', '--airportprefs', action="store_true", default=False, help='Analyse Airport preferences artifacts')
+	Parser.add_option('-g', '--wifiapgeolocate', action="store_true", default=False, help='Tries to geolocate WiFi AP found in AirportPrefs using Geomena.org')
 	Parser.add_option('-k', '--kext', action="store_true", default=False, help='Analyse kernel extensions (kext) artifacts')
+	Parser.add_option('-U', '--usersaccounts', action="store_true", default=False, help='Analyse users\' accounts artifacts')
+
 	Parser.add_option('-m', '--mrh', action="store_true", default=False, help='Perform a reputation lookup in Team Cymru\'s MRH')
 	Parser.add_option('-u', '--malwarelu', action="store_true", default=False, help='Perform a reputation lookup in Malware.lu database')
 	Parser.add_option('-v', '--virustotal', action="store_true", default=False, help='Perform a lookup in VirusTotal database.')
@@ -721,7 +947,16 @@ def Main():
 		
 	if options.browsers or options.all:
 		ParseBrowsers()
-		
+	
+	if options.wifiapgeolocate:
+		GEOLOCATE_WIFI_AP = True
+
+	if options.airportprefs or options.all:
+		ParseAirportPrefs()
+	
+	if options.usersaccounts or options.all:
+		ParseUsersAccounts()
+			
 	if options.ZipLogsFile:
 		AggregateLogs(options.ZipLogsFile)
 

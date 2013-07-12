@@ -5,13 +5,18 @@ OS X Auditor is a free Mac OS X computer forensics tool.
 OS X Auditor parses and hashes the following artifacts on the running system or a copy of a system you want to analyze:
  * the kernel extensions
  * the system agents and daemons
- * the third parties' agents and daemons
- * the old and deprecated system and third parties' startup items
+ * the third party's agents and daemons
+ * the old and deprecated system and third party's startup items
  * the users' agents
  * the users' downloaded files
+
+It extracts:
  * the users' quarantined files
- * the users' Safari history, downloads, topsites, databases and HTML5 localstore
- * the users' Firefox cookies, downloads, formhistory, permissions, places and  signons
+ * the users' Safari history, downloads, topsites, HTML5 databases and localstore
+ * the users' Firefox cookies, downloads, formhistory, permissions, places and signons
+ * the users' Chrome history, cookies, login data, top sites, web data, HTML5 databases and local storage
+ * the users' social and email accounts
+ * the WiFi access points the audited system has been connected to (and tries to geolocate them)
 
 It also looks for suspicious keywords in the .plist themselves.
  
@@ -41,10 +46,10 @@ Just copy all files from github
 
 ## Dependencies
 
-If you plan to run OS X Auditor on a Mac. You will get a full plist parsing support:
+If you plan to run OS X Auditor on a Mac, you will get a full plist parsing support with the OS X Foundation through pyobjc:
  * pip install pyobjc 
 
-If you can't install pyobjc or if you plan to run OS X Auditor on another OS than Mac OS X (You may experience some troubles with the plist parsing):
+If you can't install pyobjc or if you plan to run OS X Auditor on another OS than Mac OS X, you may experience some troubles with the plist parsing:
  * pip install biplist
  * pip install plist
 
@@ -58,8 +63,18 @@ python osxauditor.py -h
 
 ## Changelog
 
+### 0.3
+ * NEW: ability to parse Google Chrome artifacts (History, Cookies, Login Data, Top Sites, Web Data, HTML5 databases and local storage) with -b/--browsers
+ * NEW: ability to extract the Wi-Fi APs the audited system has been connected to from the Airport Preferences and tries to geolocate them using Geomena (-A/--airportprefs). You must use -g to enable the geolocation (or set GEOLOCATE_WIFI_AP to True in the code).
+ * NEW: ability to extract users' social and email accounts
+ * FIX: ability to handle the locked sqlite databases especially while auditing a live system
+ * FIX: hashes duplicates removed
+ * FIX: better identify md5 in the HTML output
+ * CHANGE: indicates if a section (Startup items, Packages directory, Db tables, etc…) is empty to clarify the output
+ * CHANGE: the downloads artifacts (-d/--downloads) include the old and new Mail.app default download directories
+ 
 ### 0.2.1
- * CHANGE/FIX: Implement a BigFileMd5() function to hash very big files, avoid MemoryError and reduce the memory footprint
+ * CHANGE/FIX: implement a BigFileMd5() function to hash very big files, avoid MemoryError execptions and reduce the memory footprint
  * FIX: UTF-8 entries from LSQuarantineEvent in ParseQuarantines()
 
 ### 0.2 
@@ -80,9 +95,7 @@ python osxauditor.py -h
  * Initial Release
 
 ## TODO
- * Google Chrome artifacts
- * Analysis of the Sandbox (/private/var/db/launchd.db)
- * Remove hashes duplicates
+ * Google Chrome 'Protocol Buffers' and SNSS artifacts
  
 ## License
 
