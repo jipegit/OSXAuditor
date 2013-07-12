@@ -65,8 +65,8 @@ python osxauditor.py -h
 
 ### 0.3
  * NEW: ability to parse Google Chrome artifacts (History, Cookies, Login Data, Top Sites, Web Data, HTML5 databases and local storage) with -b/--browsers
- * NEW: ability to extract the Wi-Fi APs the audited system has been connected to from the Airport Preferences and tries to geolocate them using Geomena (-A/--airportprefs). You must use -g to enable the geolocation (or set GEOLOCATE_WIFI_AP to True in the code).
- * NEW: ability to extract users' social and email accounts
+ * NEW: ability to extract the Wi-Fi APs the audited system has been connected to from the Airport Preferences and tries to geolocate them using Geomena (-A/--airportprefs). You must use -g/--wifiapgeolocate to enable the geolocation (or set GEOLOCATE_WIFI_AP to True in the code).
+ * NEW: ability to extract users' social and email accounts (-U/--usersaccounts)
  * FIX: ability to handle the locked sqlite databases especially while auditing a live system
  * FIX: hashes duplicates removed
  * FIX: better identify md5 in the HTML output
