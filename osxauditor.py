@@ -98,7 +98,7 @@ def HTMLLog(LogStr, TYPE):
 	
 	if TYPE == "INFO":
 		Splitted = LogStr.split(" ")
-		if re.match("[a-f\d]{32}", Splitted[0]):					#Should be a md5
+		if re.match("[A-Fa-f\d]{32}", Splitted[0]):					#Should be a md5
 			Link = "<a href=\"https://www.virustotal.com/fr/file/" + Splitted[0] + "/analysis/\">" + Splitted[0] + "</a> "
 			HTML_LOG_FILE.write("<i class='icon-file'></i> " + Link + " ".join(Splitted[1:]).decode("utf-8") + "<br />")
 		else:
