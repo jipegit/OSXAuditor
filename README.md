@@ -9,12 +9,13 @@ OS X Auditor parses and hashes the following artifacts on the running system or 
  * the old and deprecated system and third party's startup items
  * the users' agents
  * the users' downloaded files
+ * the installed applications
 
 It extracts:
  * the users' quarantined files
  * the users' Safari history, downloads, topsites, HTML5 databases and localstore
  * the users' Firefox cookies, downloads, formhistory, permissions, places and signons
- * the users' Chrome history, cookies, login data, top sites, web data, HTML5 databases and local storage
+ * the users' Chrome history and archives history, cookies, login data, top sites, web data, HTML5 databases and local storage
  * the users' social and email accounts
  * the WiFi access points the audited system has been connected to (and tries to geolocate them)
 
@@ -63,8 +64,18 @@ python osxauditor.py -h
 
 ## Changelog
 
+### 0.3.1
+ * NEW: provides with the system name, version and build of the audited system
+ * NEW: ability to analyze installed Applications (-i/--installedapps)
+ * NEW: extracts the Archived History from Google Chrome artifacts 
+ * NEW: a human readable HTML log report :)
+ * FIX: HTMLLog() and SYSLOGLog() now handle exceptions
+ * FIX: ParsePackagesDir() is now recursive and only tries to parse apps or kernel extensions. Some DEBUG output added as well
+ * FIX: HUGE UTF-8/UNICODE improvement
+ * FIX: .DS_Store and .localized files are ignored in ParsePackagesDir() 
+
 ### 0.3
- * NEW: ability to parse Google Chrome artifacts (History, Cookies, Login Data, Top Sites, Web Data, HTML5 databases and local storage) with -b/--browsers
+ * NEW: ability to parse Google Chrome artifacts (History and archives history, Cookies, Login Data, Top Sites, Web Data, HTML5 databases and local storage) with -b/--browsers
  * NEW: ability to extract the Wi-Fi APs the audited system has been connected to from the Airport Preferences and tries to geolocate them using Geomena (-A/--airportprefs). You must use -g/--wifiapgeolocate to enable the geolocation (or set GEOLOCATE_WIFI_AP to True in the code).
  * NEW: ability to extract users' social and email accounts (-U/--usersaccounts)
  * FIX: ability to handle the locked sqlite databases especially while auditing a live system
@@ -96,7 +107,9 @@ python osxauditor.py -h
 
 ## TODO
  * Google Chrome 'Protocol Buffers' and SNSS artifacts
- 
+ * Safari LastSession.plist
+ * extract events from logs
+
 ## License
 
 OS X Auditor
@@ -115,4 +128,4 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-Bootstrap have its own GPL compatible licence.
+Bootstrap and JQuery have their own GPL compatible licence.

@@ -28,7 +28,7 @@ pip-log.txt
 nosetests.xml
 *.txt
 *.html
-
+*.pptx
 # Translations
 *.mo
 
