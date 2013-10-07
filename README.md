@@ -73,7 +73,7 @@ eg. [sudo] python osxauditor.py -a -m -l localhashes.db -H log.html
  * NEW: extracts users' LoginItems
  * NEW: extracts users' RecentItems
  * NEW: extracts the LastSession from Safari artifacts
- * NEW: extract system groupes and users details
+ * NEW: extract system groups and users details
  * FIX: wrong os.path.join() calls
  * FIX: bug in the recursive ParsePackagesDir() 
 
@@ -179,7 +179,9 @@ eg. [sudo] python osxauditor.py -a -m -l localhashes.db -H log.html
  * /var/log
  * /etc/localtime
  * StartupParameters.plist
-
+ * /private/var/db/dslocal/nodes/Default/groups/admin.plist
+ * /private/var/db/dslocal/nodes/Default/users
+  
 ## TODO
  * extract user info from /private/var/db/dslocal/nodes/Default/users
 
