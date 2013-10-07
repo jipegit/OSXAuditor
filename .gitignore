@@ -41,7 +41,7 @@ nosetests.xml
 # folders
 env-*
 libs
-
+src
 
 # MAC OS X stuff
 .DS_Store

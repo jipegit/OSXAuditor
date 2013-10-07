@@ -13,7 +13,7 @@ OS X Auditor parses and hashes the following artifacts on the running system or 
 
 It extracts:
  * the users' quarantined files
- * the users' Safari history, downloads, topsites, HTML5 databases and localstore
+ * the users' Safari history, downloads, topsites, LastSession, HTML5 databases and localstore
  * the users' Firefox cookies, downloads, formhistory, permissions, places and signons
  * the users' Chrome history and archives history, cookies, login data, top sites, web data, HTML5 databases and local storage
  * the users' social and email accounts
@@ -58,11 +58,24 @@ These dependencies will be removed when a working native plist module will be av
 
 ## How to run
 
-OS X Auditor runs well with python >= 2.7.2. It does not run with a different version of python yet (due to the plist nightmare)
+ * OS X Auditor runs well with python >= 2.7.2 (2.7.5 is OK). It does not run with a different version of python yet (due to the plist nightmare)
+ * OS X Auditor is written to work on Moutain Lion. It will do his best on older OS X versions.
+ * You must run it as root (or via sudo) if you want to use is on a running system, otherwise it won't be able to access some system and other users' files
 
-python osxauditor.py -h
+Type osxauditor.py -h to get all the available options, then run it with the selected options
+
+eg. [sudo] python osxauditor.py -a -m -l localhashes.db -H log.html
 
 ## Changelog
+
+### 0.4
+ * NEW: extracts events (boot/shutdown, hibernation in/out, sudo commands, usb devices, ttys opened/closed, from the system logs and create a (not readable yet) timeline (-e/eventlogs)
+ * NEW: extracts users' LoginItems
+ * NEW: extracts users' RecentItems
+ * NEW: extracts the LastSession from Safari artifacts
+ * NEW: extract system groupes and users details
+ * FIX: wrong os.path.join() calls
+ * FIX: bug in the recursive ParsePackagesDir() 
 
 ### 0.3.1
  * NEW: provides with the system name, version and build of the audited system
@@ -105,10 +118,95 @@ python osxauditor.py -h
 ### 0.1
  * Initial Release
 
+## Artifacts
+
+### Users
+ * Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2
+ * Library/Preferences/com.apple.LaunchServices.QuarantineEvents
+ * Library/Preferences/com.apple.loginitems.plist
+ * Library/Mail Downloads/
+ * Library/Containers/com.apple.mail/Data/Library/Mail Downloads
+ * Library/Accounts/Accounts3.sqlite
+ * Library/Containers/com.apple.mail/Data/Library/Mail/V2/MailData/Accounts.plist
+ * Library/Preferences/com.apple.recentitems.plist
+
+ * Firefox
+  + Library/Application Support/Firefox/Profiles/
+  + cookies.sqlite
+  + downloads.sqlite
+  + formhistory.sqlite
+  + places.sqlite
+  + signons.sqlite
+  + permissions.sqlite
+  + addons.sqlite
+  + extensions.sqlite
+  + content-prefs.sqlite
+  + healthreport.sqlite
+  + webappsstore.sqlite
+
+ * Safari
+  + Library/Safari/
+  + Downloads.plist
+  + History.plist
+  + TopSites.plist
+  + LastSession.plist
+  + Databases
+  + LocalStorage
+
+ * Chrome
+  + Library/Application Support/Google/Chrome/Default/
+  + History
+  + Archived History
+  + Cookies
+  + Login Data
+  + Top Sites
+  + Web Data
+  + databases
+  + Local Storage
+
+### System
+ * /System/Library/LaunchAgents/
+ * /System/Library/LaunchDaemons/
+ * /System/Library/ScriptingAdditions/
+ * /System/Library/StartupItems/Library/ScriptingAdditions/
+ * /System/Library/Extensions/
+ * /System/Library/CoreServices/SystemVersion.plist
+ * /Library/LaunchAgents/
+ * /Library/LaunchDaemons/
+ * /Library/StartupItems/
+ * /Library/Preferences/SystemConfiguration/com.apple.airport.preferences.plist
+ * /Library/logs
+ * /var/log
+ * /etc/localtime
+ * StartupParameters.plist
+
 ## TODO
- * Google Chrome 'Protocol Buffers' and SNSS artifacts
- * Safari LastSession.plist
- * extract events from logs
+ * extract user info from /private/var/db/dslocal/nodes/Default/users
+
+## Related work
+
+### Disk Arbitrator
+
+Disk Arbitrator is Mac OS X forensic utility designed to help the user ensure correct forensic procedures are followed during imaging of a disk device. Disk Arbitrator is essentially a user interface to the Disk Arbitration framework, which enables a program to participate in the management of block storage devices, including the automatic mounting of file systems. When enabled, Disk Arbitrator will block the mounting of file systems to avoid mounting as read-write and violating the integrity of the evidence.
+
+https://github.com/aburgh/Disk-Arbitrator
+
+### Volafox
+
+volafox a.k.a 'Mac OS X Memory Analysis Toolkit' is developed on python 2.x
+
+https://code.google.com/p/volafox/
+
+### Mandiant Memoryze(tm) for the Mac
+
+Memoryze for the Mac is free memory forensic software that helps incident responders find evil in memory… on Macs. 
+Memoryze for the Mac can acquire and/or analyze memory images.  Analysis can be performed on offline memory images or on live systems.
+
+http://www.mandiant.com/resources/download/mac-memoryze
+
+### Volatility MacMemoryForensics
+
+https://code.google.com/p/volatility/wiki/MacMemoryForensics
 
 ## License
 
