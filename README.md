@@ -118,6 +118,11 @@ eg. [sudo] python osxauditor.py -a -m -l localhashes.db -H log.html
 ### 0.1
  * Initial Release
 
+## Design & Capabilities
+
+![Design & Capabilities](/DesignAndCapabilities_v0.4.png "Design & Capabilities")
+
+
 ## Artifacts
 
 ### Users
