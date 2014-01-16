@@ -9,7 +9,7 @@
 
 __description__ = 'OS X Auditor'
 __author__ = '@Jipe_'
-__version__ = '0.4'
+__version__ = '0.4.1'
 
 ROOT_PATH = "/"
 HOSTNAME = ""
@@ -465,7 +465,7 @@ def ParseStartupItems(StartupItemsPath):
 def ParseLaunchAgents(AgentsPath):
 	""" Parse a LanchAgent plist and hash its program argument. Also look for suspicious keywords in the plist itself """
 	
-	SuspiciousPlist = ["exec", "socket" ,"open", "connect"]
+	SuspiciousPlist = ["exec", "socket" ,"open", "connect", "/dev/tcp/", "/bin/sh"]
 	LaunchAgentPlist = False
 	
 	NbLaunchAgents = 0

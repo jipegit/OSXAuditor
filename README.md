@@ -68,6 +68,9 @@ eg. [sudo] python osxauditor.py -a -m -l localhashes.db -H log.html
 
 ## Changelog
 
+### 0.4.1
+ * CHANGE: Search for generic backdoors in LaunchAgentPlist
+
 ### 0.4
  * NEW: extracts events (boot/shutdown, hibernation in/out, sudo commands, usb devices, ttys opened/closed, from the system logs and create a (not readable yet) timeline (-e/eventlogs)
  * NEW: extracts users' LoginItems
