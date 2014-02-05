@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 #
 #  OS X Auditor
-#  
-#  Author: Jean-Philippe Teissier ( @Jipe_ ) 
-#    
+#
+#  Author: Jean-Philippe Teissier ( @Jipe_ )
+#
 #  This work is licensed under the GNU General Public License
 #
 
@@ -29,8 +29,8 @@ FOUNDATION_IS_IMPORTED = False
 BIPLIST_IS_IMPORTED  = False
 PLISTLIB_IS_IMPORTED = False
 
-SYSLOG_SERVER = False												
-SYSLOG_PORT = 514												#You can change your SYSLOG port here 
+SYSLOG_SERVER = False
+SYSLOG_PORT = 514												#You can change your SYSLOG port here
 
 MRH_HOST = u"hash.cymru.com"
 MRH_PORT = 43
@@ -74,7 +74,7 @@ try:
 	print(u"DEBUG: Mac OS X Obj-C Foundation successfully imported")
 except ImportError:
 	print(u"DEBUG: Cannot import Mac OS X Obj-C Foundation. Installing PyObjC on OS X is highly recommended")
-	try: 
+	try:
 		import biplist
 		BIPLIST_IS_IMPORTED = True
 	except ImportError:
@@ -84,10 +84,10 @@ except ImportError:
 		PLISTLIB_IS_IMPORTED = True
 	except ImportError:
 		print(u"DEBUG: Cannot import the plistlib lib. I may not be able to properly parse a binary pblist")
-			
+
 def HTMLLogFlush():
 	""" Flush the HTML report """
-	
+
 	global HTML_LOG_CONTENT
 	global HTML_LOG_MENU
 
@@ -98,8 +98,8 @@ def HTMLLogFlush():
 							<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
 							<title>OS X Auditor Report</title>
 							<link rel=\"stylesheet\" type=\"text/css\" href=\"bootstrap/css/bootstrap.min.css\">
-							<script type=\"text/javascript\" src=\"jquery/jquery-1.10.2.min.js\"></script> 
-							<script type=\"text/javascript\" src=\"bootstrap/js/bootstrap.min.js\"></script> 
+							<script type=\"text/javascript\" src=\"jquery/jquery-1.10.2.min.js\"></script>
+							<script type=\"text/javascript\" src=\"bootstrap/js/bootstrap.min.js\"></script>
 							<script type=\"text/javascript\" src=\"d3-3.2.8/d3.min.js\"></script>
 							<style type="text/css">
 							.chart {
@@ -107,28 +107,28 @@ def HTMLLogFlush():
 							}
 
 							.mini text {
-								font: 9px sans-serif;	
+								font: 9px sans-serif;
 							}
 
 							.main text {
-								font: 12px sans-serif;	
+								font: 12px sans-serif;
 							}
 
 							.miniItem0 {
 								fill: darksalmon;
-								stroke-width: 6;	
+								stroke-width: 6;
 							}
 
 							.miniItem1 {
 								fill: darkolivegreen;
 								fill-opacity: .7;
-								stroke-width: 6;	
+								stroke-width: 6;
 							}
 
 							.miniItem2 {
 								fill: slategray;
 								fill-opacity: .7;
-								stroke-width: 6;	
+								stroke-width: 6;
 							}
 
 							.brush .extent {
@@ -179,10 +179,10 @@ def HTMLLog(LogStr, TYPE):
 
 	elif TYPE == "WARNING":
 		HTML_LOG_CONTENT += u"<div class=\"alert alert-error\"><i class='icon-fire'></i> "+ LogStr + u"</div>"
-	
+
 	elif TYPE == "ERROR":
 		HTML_LOG_CONTENT += u"<div class=\"alert\"><i class='icon-warning-sign'></i> "+ LogStr + u"</div>"
-	
+
 	elif TYPE == "SECTION":
 		HTML_LOG_CONTENT += u"<h2 id=\"" + LogStr + u"\">" + LogStr + u"</h2>"
 		HTML_LOG_MENU += u"</ul></li><li class=\"dropdown\"><a href=\"#\" role=\"button\" class=\"dropdown-toggle\" data-toggle=\"dropdown\">" + LogStr + u"<b class=\"caret\"></b></a><ul class=\"dropdown-menu\">"
@@ -191,15 +191,15 @@ def HTMLLog(LogStr, TYPE):
 	elif TYPE == "SUBSECTION":
 		HTML_LOG_CONTENT += u"<h3 id=\"" + LogStr + u"\">" + LogStr + u"</h3>"
 		HTML_LOG_MENU += u"<li role=\"presentation\"><a role=\"menuitem\" tabindex=\"-1\" href=\"#" + LogStr + u"\">" + LogStr + u"</a></li>"
-	
+
 	elif TYPE == "DEBUG":
 		HTML_LOG_CONTENT += u"<i class='icon-wrench'></i> " + LogStr + u"<br>"
-	
+
 def SyslogSetup(SyslogServer):
 	""" Set the Syslog handler up"""
 
 	global SYSLOG_SERVER
-	
+
 	try:
 		Logger = logging.getLogger()
 		Syslog = logging.handlers.SysLogHandler(address=(SyslogServer, SYSLOG_PORT))
@@ -216,11 +216,11 @@ def PrintAndLog(LogStr, TYPE):
 
 	global HTML_LOG_FILE
 	global SYSLOG_SERVER
-	
+
 	if TYPE == "INFO" or "INFO_RAW":
 		print(u"[INFO] " + LogStr)
 		logging.info(LogStr)
-		
+
 	elif TYPE == "ERROR":
 		print(u"[ERROR] " + LogStr)
 		logging.error(LogStr)
@@ -228,11 +228,11 @@ def PrintAndLog(LogStr, TYPE):
 	elif TYPE == "WARNING":
 		print(u"[WARNING] " + LogStr)
 		logging.warning(LogStr)
-	
+
 	elif TYPE == "DEBUG":
 		print(u"[DEBUG] " + LogStr)
 		logging.debug(LogStr)
-	
+
 	elif TYPE == "SECTION" or TYPE == "SUBSECTION":
 		SectionTitle = u"\n#########################################################################################################\n"
 		SectionTitle += "#                                                                                                       #\n"
@@ -241,13 +241,13 @@ def PrintAndLog(LogStr, TYPE):
 		SectionTitle += "#########################################################################################################\n"
 		print(SectionTitle)
 		logging.info(u"\n" + SectionTitle)
-	
+
 	if HTML_LOG_FILE:
 		HTMLLog(LogStr, TYPE)
 
 def MHRLookup():
 	""" Perform of lookup in Team Cymru\'s MHR """
-	
+
 	PrintAndLog(u"Team Cymru MHR lookup", "SECTION")
 	PrintAndLog(u"Got %s hashes to verify" % len(HASHES), "DEBUG")
 
@@ -266,10 +266,10 @@ def MHRLookup():
 		Response += Data
 		if not Data: break
 	S.close()
-	
+
 	Lines = Response.split("\n")
 	Lines = Lines[2:-1]
-	
+
 	for line in Lines:
 		Status = line.split(" ")
 		if Status[2] == "NO_DATA":
@@ -288,20 +288,20 @@ def MlwrluLookup():
 			Params = { 'hash': Hash, 'apikey': MALWARE_LU_API_KEY }
 			UrlEncodedParams = urllib.urlencode(Params)
 			F = urllib2.urlopen(MALWARE_LU_HOST, UrlEncodedParams)
-			Data = F.read()	
-	 	
+			Data = F.read()
+
 		except (urllib2.HTTPError, e):
 			if e.code == 401:
-				PrintAndLog(u"Wrong Malware.lu api key", "ERROR") 
+				PrintAndLog(u"Wrong Malware.lu api key", "ERROR")
 			else:
 				PrintAndLog(u"Malware.lu error " + str(e.code) + " " + str(e.reason).decode("utf-8"), "ERROR")
-	
+
 		Ret = json.loads(Data)
-		
+
 		if Ret["status"]:
 			PrintAndLog(Hash + u" " + u"N/A "+ Ret["stats"], "WARNING")
 		else:
-			PrintAndLog(Hash + u" " + Ret["stats"] + u" " + Ret["error"], "INFO")			
+			PrintAndLog(Hash + u" " + Ret["stats"] + u" " + Ret["error"], "INFO")
 
 def VTLookup():
 	""" Perform of lookup in VirusTotal database """
@@ -313,16 +313,16 @@ def VTLookup():
 		param = { 'resource': ','.join(HASHES), 'apikey': VT_API_KEY }
 		data = urllib.urlencode(param)
 		f = urllib2.urlopen(VT_HOST, data)
-		data = f.read()	
- 	
+		data = f.read()
+
 	except (urllib2.HTTPError, e):
 		if e.code == 401:
-			PrintAndLog(u"Wrong VirusTotal key", "ERROR") 
+			PrintAndLog(u"Wrong VirusTotal key", "ERROR")
 		else:
 			PrintAndLog(u"VirusTotal error "+str(e.code)+" "+str(e.reason).decode("utf-8"), "ERROR")
 
 	Ret = json.loads(data)
-	
+
 	Results = []
 	if type(Ret) is dict:
 		Results.append(Ret)
@@ -344,7 +344,7 @@ def LocalLookup(HashDBPath):
 	""" Perform of lookup in a local database """
 
 	global LOCAL_HASHES_DB
-	
+
 	PrintAndLog(u"Local hashes DB lookup", "SECTION")
 	PrintAndLog(u"Got %s hashes to verify" % len(HASHES), "DEBUG")
 
@@ -354,7 +354,7 @@ def LocalLookup(HashDBPath):
 			if Line[0] != "#":
 				Line = Line.split(" ")
 				LOCAL_HASHES_DB[Line[0]] = Line[1]
-				
+
 	PrintAndLog(str(len(LOCAL_HASHES_DB)) + u" hashes loaded from the local hashes database", "DEBUG")
 
 	for Hash in HASHES:
@@ -363,7 +363,7 @@ def LocalLookup(HashDBPath):
 
 def BigFileMd5(FilePath):
 	""" Return the md5 hash of a big file """
-	
+
 	Md5 = hashlib.md5()
 	try:
 		with open(FilePath, 'rb') as f:
@@ -376,9 +376,9 @@ def BigFileMd5(FilePath):
 
 def UniversalReadPlist(PlistPath):
 	""" Try to read a plist depending of the plateform and the available libs. Good luck Jim... """
-	
+
 	plistDictionnary = False
-	
+
 	if FOUNDATION_IS_IMPORTED:
 		plistNSData, errorMessage = Foundation.NSData.dataWithContentsOfFile_options_error_(PlistPath, Foundation.NSUncachedRead, None)
 		if errorMessage is not None or plistNSData is None:
@@ -387,7 +387,7 @@ def UniversalReadPlist(PlistPath):
 		if errorMessage is not None or plistDictionnary is None:
 			PrintAndLog(u"Unable to read in the data from the plist file: " + PlistPath.decode("utf-8"), "ERROR")
 		if not hasattr(plistDictionnary, "has_key"):
-			PrintAndLog(u"The plist does not have a dictionary as its root as expected: " + PlistPath.decode("utf-8"), "ERROR")	
+			PrintAndLog(u"The plist does not have a dictionary as its root as expected: " + PlistPath.decode("utf-8"), "ERROR")
 		return plistDictionnary
 	else:
 		if BIPLIST_IS_IMPORTED:
@@ -398,7 +398,7 @@ def UniversalReadPlist(PlistPath):
 			except:
 				PrintAndLog(u"Cannot parse " + PlistPath.decode("utf-8") + u" (Binary or JSON plist may FAIL) \n", "ERROR")
 			return plistDictionnary
-		
+
 		elif PLISTLIB_IS_IMPORTED:
 			try:
 				plistDictionnary = plistlib.readPlist(PlistPath)
@@ -406,16 +406,16 @@ def UniversalReadPlist(PlistPath):
 				PrintAndLog (u"Cannot open " + PlistPath.decode("utf-8") , "ERROR")
 			except:
 				PrintAndLog(u"Cannot parse " + PlistPath.decode("utf-8") + u" (Binary or JSON plist may FAIL) \n", "ERROR")
-			return plistDictionnary	
+			return plistDictionnary
 		else:
 			PrintAndLog(u"Cannot parse " + PlistPath.decode("utf-8") + u". No plist lib available.\n", "ERROR")
 			return None
-	
+
 def ParseQuarantines():
 	""" Parse users\' quarantines """
 
 	PrintAndLog(u"Quarantines", "SECTION")
-	
+
 	for User in os.listdir(os.path.join(ROOT_PATH, "Users/")):
 		if User[0] != ".":
 			PrintAndLog(User.decode("utf-8") +"\'s quarantine", "SUBSECTION")
@@ -443,19 +443,19 @@ def ParseStartupItems(StartupItemsPath):
 
 	StartupItemsPlist = False
 	NbStartupItems = 0
-	
+
 	for StartupItems in os.listdir(StartupItemsPath):
 		StartupItemsPlistPath = os.path.join(StartupItemsPath, StartupItems, "StartupParameters.plist")
-		
+
 		PrintAndLog(StartupItemsPlistPath, "DEBUG")
 		StartupItemsPlist = UniversalReadPlist(StartupItemsPlistPath)
-		
+
 		if StartupItemsPlist:
 			if "Provides" in StartupItemsPlist:
 				FilePath = os.path.join(StartupItemsPath, StartupItems, StartupItemsPlist["Provides"][0])
 				Md5 = BigFileMd5(FilePath)
 				if Md5:
-					if Md5 not in HASHES: 
+					if Md5 not in HASHES:
 						HASHES.append(Md5)
 					PrintAndLog(Md5 + u" "+ FilePath.decode("utf-8") + u" - " + time.ctime(os.path.getmtime(FilePath)) + u" - " + time.ctime(os.path.getctime(FilePath))+ u"\n", "INFO")
 		NbStartupItems += 1
@@ -464,23 +464,23 @@ def ParseStartupItems(StartupItemsPath):
 
 def ParseLaunchAgents(AgentsPath):
 	""" Parse a LanchAgent plist and hash its program argument. Also look for suspicious keywords in the plist itself """
-	
+
 	SuspiciousPlist = ["exec", "socket" ,"open", "connect", "/dev/tcp/", "/bin/sh"]
 	LaunchAgentPlist = False
-	
+
 	NbLaunchAgents = 0
 	for LaunchAgent in os.listdir(AgentsPath):
 		LaunchAgentPlistpath = os.path.join(AgentsPath, LaunchAgent)
-		
+
 		PrintAndLog(LaunchAgentPlistpath, "DEBUG")
 		LaunchAgentPlist = UniversalReadPlist(LaunchAgentPlistpath)
-		
+
 		if LaunchAgentPlist:
 			if "Program" in LaunchAgentPlist and "Label" in LaunchAgentPlist:
 				FilePath = LaunchAgentPlist["Program"]
 				Md5 = BigFileMd5(FilePath)
 				if Md5:
-					if Md5 not in HASHES: 
+					if Md5 not in HASHES:
 						HASHES.append(Md5)
 					PrintAndLog(Md5 + u" "+ FilePath.decode("utf-8") + u" - " + time.ctime(os.path.getmtime(FilePath)) + u" - " + time.ctime(os.path.getctime(FilePath)) + u"\n", "INFO")
 				continue
@@ -488,17 +488,17 @@ def ParseLaunchAgents(AgentsPath):
 				FilePath = LaunchAgentPlist["ProgramArguments"][0]
 				Md5 = BigFileMd5(FilePath)
 				if Md5:
-					if Md5 not in HASHES: 
+					if Md5 not in HASHES:
 						HASHES.append(Md5)
 					PrintAndLog(Md5 + u" "+ FilePath.decode("utf-8") + u" - " + time.ctime(os.path.getctime(FilePath)) + u" - " + time.ctime(os.path.getmtime(FilePath)) + u"\n", "INFO")
 				if len(LaunchAgentPlist["ProgramArguments"]) >= 3:
 					if any(x in LaunchAgentPlist["ProgramArguments"][2] for x in SuspiciousPlist):
 						PrintAndLog(LaunchAgentPlist["ProgramArguments"][2].decode("utf-8")+ u" in " + LaunchAgentPlistpath.decode("utf-8") + u" looks suspicious", "WARNING")
 		NbLaunchAgents += 1
-		
+
 	if NbLaunchAgents == 0:
 		PrintAndLog(AgentsPath.decode("utf-8") + u" is empty", "INFO")
-			
+
 def ParseStartup():
 	""" Parse the different LauchAgents and LaunchDaemons  """
 
@@ -506,13 +506,13 @@ def ParseStartup():
 
 	PrintAndLog(u"System agents", "SUBSECTION")
 	ParseLaunchAgents(os.path.join(ROOT_PATH, "System/Library/LaunchAgents/"))
-	
+
 	PrintAndLog(u"System daemons", "SUBSECTION")
 	ParseLaunchAgents(os.path.join(ROOT_PATH, "System/Library/LaunchDaemons/"))
-	
+
 	PrintAndLog(u"Third party agents", "SUBSECTION")
 	ParseLaunchAgents(os.path.join(ROOT_PATH, "Library/LaunchAgents/"))
-	
+
 	PrintAndLog(u"Third party daemons", "SUBSECTION")
 	ParseLaunchAgents(os.path.join(ROOT_PATH, "Library/LaunchDaemons/"))
 
@@ -525,10 +525,10 @@ def ParseStartup():
 	# Parse the old and deprecated Startup Items
 	PrintAndLog(u"Deprecated system StartupItems", "SUBSECTION")
 	ParseStartupItems(os.path.join(ROOT_PATH, "System/Library/StartupItems/"))
-	
+
 	PrintAndLog(u"Deprecated third party StartupItems", "SUBSECTION")
 	ParseStartupItems(os.path.join(ROOT_PATH, "Library/StartupItems/"))
-	
+
 	PrintAndLog(u"Users\' agents", "SUBSECTION")
 	for User in os.listdir(os.path.join(ROOT_PATH, "Users")):
 		UserLAPath = os.path.join(ROOT_PATH, "Users", User, "Library/LaunchAgents/")
@@ -543,16 +543,16 @@ def ParseStartup():
 			PrintAndLog(User + u"\'s LoginItems", "SUBSECTION")
 			PrintAndLog(LoginItemsPlistPath, "DEBUG")
 			LoginItemsPlist = UniversalReadPlist(LoginItemsPlistPath)
-			
+
 			if "SessionItems" in LoginItemsPlist:
 				CustomListItems = LoginItemsPlist["SessionItems"]["CustomListItems"]
 				for CustomListItem in CustomListItems:
-					PrintAndLog(CustomListItem["Name"].decode("utf-8") + u" - " + binascii.hexlify(CustomListItem["Alias"]).decode("hex").decode("utf-8", "ignore"), "INFO")	
+					PrintAndLog(CustomListItem["Name"].decode("utf-8") + u" - " + binascii.hexlify(CustomListItem["Alias"]).decode("hex").decode("utf-8", "ignore"), "INFO")
 
 def HashDir(Title, Path):
 	""" Hash a direrctory and add the hashes"""
 	PrintAndLog(Title.decode("utf-8"), "SUBSECTION")
-	
+
 	NbFiles = 0
 	for Root, Dirs, Files in os.walk(Path):
 		for File in Files:
@@ -563,7 +563,7 @@ def HashDir(Title, Path):
 					HASHES.append(Md5)
 				PrintAndLog(Md5 +" "+ FilePath.decode("utf-8") + u" - " + time.ctime(os.path.getmtime(FilePath)) + u" - " + time.ctime(os.path.getctime(FilePath)) + u"\n", "INFO")
 			NbFiles += 1
-	
+
 	if NbFiles == 0:
 		PrintAndLog(Path.decode("utf-8") + u" is empty", "INFO")
 
@@ -574,12 +574,12 @@ def ParseDownloads():
 	for User in os.listdir(os.path.join(ROOT_PATH, "Users")):
 		if User[0] != ".":
 			DlUserPath = os.path.join(ROOT_PATH, "Users", User, "Downloads")
-			if os.path.isdir(DlUserPath): 
+			if os.path.isdir(DlUserPath):
 				HashDir(User + u"\'s downloads", DlUserPath)
 			else:
 				PrintAndLog(DlUserPath + u" does not exist", "DEBUG")
 			OldEmailUserPath = os.path.join(ROOT_PATH, "Users", User, "Library/Mail Downloads/")
-			if os.path.isdir(OldEmailUserPath): 
+			if os.path.isdir(OldEmailUserPath):
 				HashDir(User + u"\'s old email downloads", OldEmailUserPath)
 			else:
 				PrintAndLog(OldEmailUserPath + u" does not exist", "DEBUG")
@@ -587,8 +587,8 @@ def ParseDownloads():
 			if os.path.isdir(EmailUserPath):
 				HashDir(User + u"\'s email downloads", EmailUserPath)
 			else:
-				PrintAndLog(EmailUserPath + u" does not exist", "DEBUG")			
-	
+				PrintAndLog(EmailUserPath + u" does not exist", "DEBUG")
+
 def DumpSQLiteDb(SQLiteDbPath):
 	""" Dump a SQLite database file """
 
@@ -618,15 +618,15 @@ def ParseFirefoxProfile(User, Profile):
 	""" Parse the different SQLite databases in a Firefox profile """
 
 	PrintAndLog(User + u"\'s Firefox profile (" + Profile.decode("utf-8") + u")", "SUBSECTION")
-	
+
 	#Most useful See http://kb.mozillazine.org/Profile_folder_-_Firefox
 	DumpSQLiteDb(os.path.join(ROOT_PATH, "Users", User, "Library/Application Support/Firefox/Profiles/", Profile, "cookies.sqlite"))
 	DumpSQLiteDb(os.path.join(ROOT_PATH, "Users", User, "Library/Application Support/Firefox/Profiles/", Profile, "downloads.sqlite"))
 	DumpSQLiteDb(os.path.join(ROOT_PATH, "Users", User, "Library/Application Support/Firefox/Profiles/", Profile, "formhistory.sqlite"))
 	DumpSQLiteDb(os.path.join(ROOT_PATH, "Users", User, "Library/Application Support/Firefox/Profiles/", Profile, "places.sqlite"))
 	DumpSQLiteDb(os.path.join(ROOT_PATH, "Users", User, "Library/Application Support/Firefox/Profiles/", Profile, "signons.sqlite"))
-	
-	#Secondary 
+
+	#Secondary
 	DumpSQLiteDb(os.path.join(ROOT_PATH, "Users", User, "Library/Application Support/Firefox/Profiles/", Profile, "permissions.sqlite"))
 	DumpSQLiteDb(os.path.join(ROOT_PATH, "Users", User, "Library/Application Support/Firefox/Profiles/", Profile, "addons.sqlite"))
 	DumpSQLiteDb(os.path.join(ROOT_PATH, "Users", User, "Library/Application Support/Firefox/Profiles/", Profile, "extensions.sqlite"))
@@ -636,7 +636,7 @@ def ParseFirefoxProfile(User, Profile):
 
 def ParseFirefox():
 	""" Walk in all users' FireFox profiles and call ParseFirefoxProfile() """
-	
+
 	PrintAndLog(u"Users\' Firefox profiles", "SUBSECTION")
 	for User in os.listdir(os.path.join(ROOT_PATH, "Users")):
 		UserFFProfilePath = os.path.join(ROOT_PATH, "Users", User, "Library/Application Support/Firefox/Profiles")
@@ -652,15 +652,15 @@ def ParseSafariProfile(User, Path):
 	HistoryPlist = False
 	DownloadsPlist = False
 	NbFiles = 0
-	
+
 	PrintAndLog(User + u"\'s Safari profile", "SUBSECTION")
 
 	PrintAndLog(User + u"\'s Safari downloads", "SUBSECTION")
 	DownloadsPlistPath = os.path.join(Path, "Downloads.plist")
 	PrintAndLog(DownloadsPlistPath.decode("utf-8"), "DEBUG")
-	
+
 	DownloadsPlist = UniversalReadPlist(DownloadsPlistPath)
-	
+
 	if DownloadsPlist:
 		if "DownloadHistory" in DownloadsPlist:
 			Downloads = DownloadsPlist["DownloadHistory"]
@@ -686,10 +686,10 @@ def ParseSafariProfile(User, Path):
 					HStr += unicode(H["diplayTitle"]) + u" - "
 				HStr += unicode(H[""]) + u"\n"
 				PrintAndLog(HStr, "INFO")
-	
+
 	PrintAndLog(User + u"\'s Safari TopSites", "SUBSECTION")
 	TopSitesPlistPath = os.path.join(Path, "TopSites.plist")
-	
+
 	PrintAndLog(TopSitesPlistPath.decode("utf-8"), "DEBUG")
 	TopSitesPlist = UniversalReadPlist(TopSitesPlistPath)
 
@@ -700,13 +700,13 @@ def ParseSafariProfile(User, Path):
 				TStr = u""
 				if "TopSiteTitle" in T:
 					TStr += unicode(T["TopSiteTitle"]) + u" - "
-				TStr += unicode(T["TopSiteURLString"]) + u"\n"	
+				TStr += unicode(T["TopSiteURLString"]) + u"\n"
 				PrintAndLog(TStr , "INFO")
-	
+
 
 	PrintAndLog(User + u"\'s Safari LastSession", "SUBSECTION")
 	LastSessionPlistPath = os.path.join(Path, "LastSession.plist")
-	
+
 	PrintAndLog(LastSessionPlistPath.decode("utf-8"), "DEBUG")
 	LastSessionPlist = UniversalReadPlist(LastSessionPlistPath)
 
@@ -723,7 +723,7 @@ def ParseSafariProfile(User, Path):
 
 	if	NbFiles == 0:
 		PrintAndLog(User + u"\'s Safari databases is empty", "INFO")
-	
+
 	NbFile = 0
 
 	PrintAndLog(User + u"\'s Safari LocalStorage", "SUBSECTION")
@@ -733,7 +733,7 @@ def ParseSafariProfile(User, Path):
 
 	if	NbFiles == 0:
 		PrintAndLog(User + u"\'s Safari LocalStorage is empty", "INFO")
-	
+
 def ParseSafari():
 	PrintAndLog(u"Users\' Safari profiles", "SUBSECTION")
 	for User in os.listdir(os.path.join(ROOT_PATH, "Users")):
@@ -765,7 +765,7 @@ def ParseChromeProfile(User, Path):
 
 	PrintAndLog(User + u"\'s Chrome web data", "SUBSECTION")
 	DumpSQLiteDb(os.path.join(Path, "Web Data"))
-	
+
 	PrintAndLog(User + u"\'s Chrome databases", "SUBSECTION")
 	for Db in os.listdir(os.path.join(Path, "databases")):
 		CurrentDbPath = os.path.join(Path, "databases", Db)
@@ -775,7 +775,7 @@ def ParseChromeProfile(User, Path):
 
 	if	NbFiles == 0:
 		PrintAndLog(User + u"\'s Chrome databases is empty", "INFO")
-	
+
 	NbFiles = 0
 
 	PrintAndLog(User + u"\'s Chrome LocalStorage", "SUBSECTION")
@@ -796,7 +796,7 @@ def ParseChrome():
 		UsersChromePath = os.path.join(ROOT_PATH, "Users", User, "Library/Application Support/Google/Chrome/Default")
 		if User[0] != "." and os.path.isdir(UsersChromePath):
 			ParseChromeProfile(User, UsersChromePath)
-	
+
 def ParseBrowsers():
 	""" Call the different functions to parse the browsers   """
 
@@ -815,7 +815,7 @@ def ParsePackagesDir(PackagesDirPath):
 	PackagePlistPath = ""
 	CFBundleExecutablepath = ""
 	NbPackages = 0
-		
+
 	for PackagePath in os.listdir(PackagesDirPath):
 		if PackagePath not in IgnoredFiles:
 			if PackagePath[-4:] == ".app" or PackagePath[-5:] == ".kext":
@@ -847,18 +847,18 @@ def ParsePackagesDir(PackagesDirPath):
 					else:
 						PrintAndLog(u"Cannot find the CFBundleExecutable key in " + PackagePlistPath.decode("utf-8") + u"\n", "ERROR")
 			NbPackages += 1
-			
+
 			if os.path.isdir(os.path.join(PackagesDirPath, PackagePath)):
 				ParsePackagesDir(os.path.join(PackagesDirPath, PackagePath))
-		
+
 		else: continue
-		
+
 	if NbPackages == 0:
 		PrintAndLog(PackagesDirPath.decode("utf-8") + u" is empty (no package found)", "INFO")
 
 def ParseKext():
 	""" Parse the Kernel extensions """
-	
+
 	PrintAndLog(u"Kernel extensions", "SECTION")
 	ParsePackagesDir(os.path.join(ROOT_PATH, "System/Library/Extensions/"))
 
@@ -886,7 +886,7 @@ def AggregateLogs(ZipLogsFile):
 	PrintAndLog(u"Log files aggregation", "SECTION")
 	ZipLogsFilePath = os.path.join(ZipLogsFile, "OSXAuditor_report_", HOSTNAME, "_", time.strftime("%Y%m%d-%H%M%S", time.gmtime()), ".zip")
 	PrintAndLog(u"All log files are aggregated in " + ZipLogsFilePath.decode("utf-8"), "DEBUG")
-	
+
 	try:
 		with zipfile.ZipFile(ZipLogsFilePath, 'w') as ZipLogsFile:
 			PrintAndLog(os.path.join(ROOT_PATH, "var/log").decode("utf-8") + u" files aggregation", "SUBSECTION")
@@ -906,43 +906,43 @@ def GeomenaApiLocation(Ssid):
 	NormalizedSsid = ""
 	Latitude = "Not found"
 	Longitude = "Not found"
-	
+
 	Ssid = Ssid.split(":")
-	
+
 	for i in Ssid:
 		if len(i) == 1:
 			i = "0"+i
 		NormalizedSsid += i
-		
+
 	PrintAndLog(u"Geomena query for " + "".join(NormalizedSsid), "DEBUG")
 
 	try:
 		F = urllib2.urlopen(GEOMENA_API_HOST + NormalizedSsid)
-		Data = F.read()	
+		Data = F.read()
 	except urllib2.HTTPError as e:
 		PrintAndLog(u"Geomena API error " + str(e.code) + " " + str(e.reason).decode("utf-8"), "ERROR")
-	
+
 	M = re.match(".+\sLatitude:\s([-\d\.]{1,19})\s.+\sLongitude:\s([-\d\.]{1,19})\s.+", Data, re.DOTALL)
 	if M:
 		Latitude = M.group(1)
 		Longitude = M.group(2)
-		
+
 	return u"Latitude: " + Latitude + u" Longitude: " + Longitude
-	
+
 def ParseAirportPrefs():
 	""" Parse Airport preferences and try to extract geolocation information """
-	
+
 	global HTML_LOG_FILE
 	AirportPrefPlist = False
 	NbAirportPrefs = 0
-	
+
 	PrintAndLog(u"Airport preferences", "SECTION")
 
 	AirportPrefPlistPath = os.path.join(ROOT_PATH, "Library/Preferences/SystemConfiguration/com.apple.airport.preferences.plist")
-	
+
 	PrintAndLog(AirportPrefPlistPath, "DEBUG")
 	AirportPrefPlist = UniversalReadPlist(AirportPrefPlistPath)
-	
+
 	if AirportPrefPlist:
 		if "RememberedNetworks" in AirportPrefPlist:
 			RememberedNetworks = AirportPrefPlist["RememberedNetworks"]
@@ -962,11 +962,11 @@ def ParseMailAppAccount(MailAccountPlistPath):
 	MailAccountPlist = False
 	NbMailAccounts = 0
 	NbSmtpAccounts = 0
-	
+
 	PrintAndLog(MailAccountPlistPath, "DEBUG")
 
 	MailAccountPlist = UniversalReadPlist(MailAccountPlistPath)
-	
+
 	if MailAccountPlist:
 		PrintAndLog(u"Email accounts", "SUBSECTION")
 		if "MailAccounts" in MailAccountPlist:
@@ -979,7 +979,7 @@ def ParseMailAppAccount(MailAccountPlistPath):
 					if "SSLEnabled" in MailAccount: MAccountPref += "SSLEnabled: " + MailAccount["SSLEnabled"] + " - "
 					if "Username" in MailAccount: MAccountPref += "Username: " + MailAccount["Username"]  + " - "
 					if "Hostname" in MailAccount: MAccountPref += "Hostname: " + MailAccount["Hostname"]  + " - "
-					if "PortNumber" in MailAccount: MAccountPref += "(" + MailAccount["PortNumber"]  + ") - "				
+					if "PortNumber" in MailAccount: MAccountPref += "(" + MailAccount["PortNumber"]  + ") - "
 					if "SMTPIdentifier" in MailAccount: MAccountPref += "SMTPIdentifier: " + MailAccount["SMTPIdentifier"]  + " - "
 					if "EmailAddresses" in MailAccount:
 						for EmailAddresse in MailAccount["EmailAddresses"]:
@@ -988,7 +988,7 @@ def ParseMailAppAccount(MailAccountPlistPath):
 				NbMailAccounts += 1
 			if NbMailAccounts == 0:
 				PrintAndLog(u"No email account)","INFO")
-		
+
 		PrintAndLog(u"SMTP accounts", "SUBSECTION")
 		if "DeliveryAccounts" in MailAccountPlist:
 			DeliveryAccounts = MailAccountPlist["DeliveryAccounts"]
@@ -1000,12 +1000,12 @@ def ParseMailAppAccount(MailAccountPlistPath):
 					if "SSLEnabled" in DeliveryAccount: DAccountPref += "SSLEnabled: " + DeliveryAccount["SSLEnabled"] + " - "
 					if "Username" in DeliveryAccount: DAccountPref += "Username: " + DeliveryAccount["Username"]  + " - "
 					if "Hostname" in DeliveryAccount: DAccountPref += "Hostname: " + DeliveryAccount["Hostname"]  + " - "
-					if "PortNumber" in DeliveryAccount: DAccountPref += "(" + MailAccount["PortNumber"]  + ") - "				
+					if "PortNumber" in DeliveryAccount: DAccountPref += "(" + MailAccount["PortNumber"]  + ") - "
 					PrintAndLog(DAccountPref.decode("utf-8"), "INFO")
 				NbSmtpAccounts += 1
 			if NbSmtpAccounts == 0:
 				PrintAndLog(u"No SMTP account)","INFO")
-	
+
 def ParseUsersRecentItems(RecentItemsAccountPlistPath):
 	""" Parse users' recents items"""
 
@@ -1018,7 +1018,7 @@ def ParseUsersRecentItems(RecentItemsAccountPlistPath):
 		RecentServers = RecentItemsAccountPlist["RecentServers"]["CustomListItems"]
 		if len(RecentServers) != 0:
 			for RecentServer in RecentServers:
-				RecentServersList += RecentServer["Name"] + " -> " #+ RecentServer["URL"] 
+				RecentServersList += RecentServer["Name"] + " -> " #+ RecentServer["URL"]
 			PrintAndLog("Recent servers : " + RecentServersList, "INFO")
 		else:
 			PrintAndLog("No recent servers", "INFO")
@@ -1042,7 +1042,7 @@ def ParseUsersRecentItems(RecentItemsAccountPlistPath):
 			PrintAndLog("Recent Applications : " + RecentApplicationsList, "INFO")
 		else:
 			PrintAndLog("No recent applications", "INFO")
-	
+
 	if "Hosts" in RecentItemsAccountPlist:
 		RecentHostsList = ""
 		RecentHosts = RecentItemsAccountPlist["Hosts"]["CustomListItems"]
@@ -1064,7 +1064,7 @@ def StringFromDic(dic):
 
 def ParseSysUsers():
 	""" Parse the system users db """
-	
+
 	global ADMINS
 
 	PrintAndLog(u"System\'s users", "SUBSECTION")
@@ -1072,46 +1072,46 @@ def ParseSysUsers():
 		if User[0] != ".":
 			SysUserPlistPath = os.path.join(ROOT_PATH, "private/var/db/dslocal/nodes/Default/users", User)
 			PrintAndLog(User[:-6] + u"\'s system account details", "SUBSECTION")
-			
+
 			SysUserPlist = UniversalReadPlist(SysUserPlistPath)
-			
+
 			UserDetails =""
 			if "name" in SysUserPlist:
 				Names = u""
 				for Name in SysUserPlist["name"]:
 					Names += Name
-					if Name in ADMINS: 
+					if Name in ADMINS:
 						Names += u" (is Admin)"
 					Names += u"\n"
 				UserDetails += u"Name(s): " + Names
-			
+
 			if "realname" in SysUserPlist:
 				UserDetails += u"Real Name(s): " + StringFromDic(SysUserPlist["realname"])
-			
+
 			if "shell" in SysUserPlist:
 				UserDetails += u"Shell(s): " + StringFromDic(SysUserPlist["shell"])
-			
+
 			if "home" in SysUserPlist:
 				UserDetails += u"Home(s): " + StringFromDic(SysUserPlist["home"])
-			
+
 			if "uid" in SysUserPlist:
 				UserDetails += u"UID(s): " + StringFromDic(SysUserPlist["uid"])
 
 			if "gid" in SysUserPlist:
 				UserDetails += u"GID(s): " + StringFromDic(SysUserPlist["gid"])
-			
+
 			if "generateduid" in SysUserPlist:
 				Generateduids = u""
 				for Generateduid in SysUserPlist["generateduid"]:
 					Generateduids += Generateduid
-					if Generateduid in ADMINS: 
+					if Generateduid in ADMINS:
 						Generateduids += u" (is Admin)"
 					Generateduids += u"\n"
 				UserDetails += u"generated UID(s): " + Generateduids
-			
+
 			if "LinkedIdentity" in SysUserPlist:
 				UserDetails += u"LinkedIdentities have been found. Extraction of LinkedIdentities is not implemented yet."
-			
+
 			PrintAndLog(UserDetails, "INFO_RAW")
 
 def ParseSysAdminsGroup():
@@ -1120,23 +1120,23 @@ def ParseSysAdminsGroup():
 	global ADMINS
 
 	PrintAndLog(u"System\'s admins", "SUBSECTION")
-	
+
 	SysAdminsPlistPath = os.path.join(ROOT_PATH, "private/var/db/dslocal/nodes/Default/groups/admin.plist")
 	SysAdminsPlist = UniversalReadPlist(SysAdminsPlistPath)
-	
+
 	if "groupmembers" in SysAdminsPlist:
 		for Admin in SysAdminsPlist["groupmembers"]:
 			ADMINS.append(Admin)
-	
+
 	if "users" in SysAdminsPlist:
 		for Admin in SysAdminsPlist["users"]:
 			ADMINS.append(Admin)
 
 	Admins = u""
 	for Admin in ADMINS:
-		Admins += Admin + u"\n" 
+		Admins += Admin + u"\n"
 	PrintAndLog(Admins, "INFO_RAW")
-	
+
 def ParseUsersAccounts():
 	""" Parse users' accounts """
 
@@ -1161,7 +1161,7 @@ def ParseUsersAccounts():
 				ParseMailAppAccount(MailAccountPlistPath)
 			else:
 				PrintAndLog(User + u" has no Mail.app account", "INFO")
-	
+
 	PrintAndLog(u"Users\' recent items", "SUBSECTION")
 	for User in os.listdir(os.path.join(ROOT_PATH, "Users")):
 		RecentItemsAccountPlistPath = os.path.join(ROOT_PATH, "Users", User, "Library/Preferences/com.apple.recentitems.plist")
@@ -1183,17 +1183,17 @@ def ParseInstalledApps():
 
 def GetAuditedSystemVersion():
 	""" Simply return the system version """
-	
-	SysVersion = "Unknown system version" 
+
+	SysVersion = "Unknown system version"
 	SystemVersionPlist = False
 
 	SystemVersionPlist = UniversalReadPlist("/System/Library/CoreServices/SystemVersion.plist")
-	
+
 	if SystemVersionPlist:
 		if "ProductName" in SystemVersionPlist: SysVersion = SystemVersionPlist["ProductName"]
-		if "ProductVersion" in SystemVersionPlist: SysVersion += " " + SystemVersionPlist["ProductVersion"] 
-		if "ProductBuildVersion" in SystemVersionPlist: SysVersion += " build " + SystemVersionPlist["ProductBuildVersion"] 
-	else:	 
+		if "ProductVersion" in SystemVersionPlist: SysVersion += " " + SystemVersionPlist["ProductVersion"]
+		if "ProductBuildVersion" in SystemVersionPlist: SysVersion += " build " + SystemVersionPlist["ProductBuildVersion"]
+	else:
 		PrintAndLog(u"Cannot determine the system version", "ERROR")
 
 	return SysVersion
@@ -1201,8 +1201,8 @@ def GetAuditedSystemVersion():
 
 def GetAuditedSystemTimezone():
 	""" Return the current system timezone """
-	
-	Timezone = False 
+
+	Timezone = False
 	try:
 		Timezone = os.path.realpath(os.path.join(ROOT_PATH, "etc/localtime"))
 		Timezone = Timezone.split("/")
@@ -1214,7 +1214,7 @@ def GetAuditedSystemTimezone():
 
 def ParseSystemlogFile(SystemLogPath, Year, Bzip2ed=False):
 	""" Extract events from a System.log file """
-	
+
 	global HTML_EVENTS_LANES
 	global HTML_EVENTS_ITEMS
 	global HTML_EVENTS_LANES_CPT
@@ -1225,7 +1225,7 @@ def ParseSystemlogFile(SystemLogPath, Year, Bzip2ed=False):
 	try:
 		with open(SystemLogPath, 'r') as SystemLogFile:
 			SystemLogData = SystemLogFile.read()
-			
+
 			if Bzip2ed: SystemLogData = bz2.decompress(SystemLogData)
 
 			DateRegex = "^(\w{3}\s{1,2}\d{1,2}\s[\d:]{8})"
@@ -1235,7 +1235,7 @@ def ParseSystemlogFile(SystemLogPath, Year, Bzip2ed=False):
 
 			HibernationInTimesLRegExp = re.compile(DateRegex + ".+\sPMScheduleWakeEventChooseBest", re.MULTILINE)		#Lion
 			HibernationInTimesMLRegExp = re.compile(DateRegex + ".+\shibernate_setup\(0\)\stook", re.MULTILINE)		#Mountain Lion
-			HibernationOutTimesLRegExp = re.compile(DateRegex + ".+\sMessage\sWake", re.MULTILINE)						#Lion TOFIX (in SYSLOG)	
+			HibernationOutTimesLRegExp = re.compile(DateRegex + ".+\sMessage\sWake", re.MULTILINE)						#Lion TOFIX (in SYSLOG)
 			HibernationOutTimesMLRegExp = re.compile(DateRegex + ".+\sWake\sreason", re.MULTILINE)						#Mountain Lion
 
 			LockedSessionsLRegExp = re.compile(DateRegex + ".+\sloginwindow", re.MULTILINE)							#Lion
@@ -1283,7 +1283,7 @@ def ParseSystemlogFile(SystemLogPath, Year, Bzip2ed=False):
 
 			SessionsUnlockFail = SessionsUnlockFailRegExp.findall(SystemLogData)
 			for Item in SessionsUnlockFail: AllEvents.append([Item, "Sessions unlock FAIL", 6])
-			
+
 			SessionsUnlockOk = SessionsUnlockOkRegExp.findall(SystemLogData)
 			for Item in SessionsUnlockOk: AllEvents.append([Item, "Sessions unlock OK", 7])
 
@@ -1295,7 +1295,7 @@ def ParseSystemlogFile(SystemLogPath, Year, Bzip2ed=False):
 
 			USBsKernel = USBKernelRegExp.findall(SystemLogData)
 			for Item in USBsKernel: AllEvents.append([Item, "USB device (kernel)", 10])
-			
+
 			USBFsEvents = USBFsEventRegExp.findall(SystemLogData)
 			for Item in USBFsEvents: AllEvents.append([Item, "USB device (filesystem)", 11])
 
@@ -1310,7 +1310,7 @@ def ParseSystemlogFile(SystemLogPath, Year, Bzip2ed=False):
 
 			# NetsChangeL = NetChangeLRegExp.findall(SystemLogData)
 			# AllEvents.append([NetsChangeL, "Network change", 15])
-		
+
 			# NetsChangeML = NetChangeMLRegExp.findall(SystemLogData)
 			# AllEvents.append([NetsChangeML, "Network change", 15])
 
@@ -1323,7 +1323,7 @@ def ParseSystemlogFile(SystemLogPath, Year, Bzip2ed=False):
 				if len(SplittedTime) == 3:
 					EventTimeWithYear = " ".join(SplittedTime[0:2]) + ", " + Year + " " + SplittedTime[2]
 				elif len(SplittedTime) == 4:
-					EventTimeWithYear = " ".join(SplittedTime[0:3]) + ", " + Year + " " + SplittedTime[3]		
+					EventTimeWithYear = " ".join(SplittedTime[0:3]) + ", " + Year + " " + SplittedTime[3]
 				else:
 					PrintAndLog(u"Cannot parse a syslog date", "ERROR")
 					EventTimeWithYear = "Error"
@@ -1334,7 +1334,7 @@ def ParseSystemlogFile(SystemLogPath, Year, Bzip2ed=False):
 
 def ParseEventLogs():
 	""" Extract events from the event logs """
-	
+
 	global HTML_EVENTS_TL
 	global HTML_LOG_CONTENT
 	global HTML_EVENTS_LANES
@@ -1342,13 +1342,13 @@ def ParseEventLogs():
 	PrintAndLog("Event logs", "SECTION")
 
 	SystemLogsPath = os.path.join(ROOT_PATH, "var/log/")
-	
+
 	PrintAndLog("System logs", "SUBSECTION")
 
 	for LogFile in os.listdir(SystemLogsPath):
 		LogFilePath = os.path.join(SystemLogsPath, LogFile)
 		Year = time.strftime("%Y", time.localtime(os.path.getctime(LogFilePath)))									#nasty hack because the syslog format sucks
-		
+
 		if re.match("^system\.log$", LogFile):
 			ParseSystemlogFile(LogFilePath, Year)
 		if re.match("^system\.log\.\d\.bz2$", LogFile):
@@ -1357,7 +1357,7 @@ def ParseEventLogs():
 	Lanes = "\", \"".join(HTML_EVENTS_LANES)
 
 	HTML_EVENTS_TL += "<script type=\"text/javascript\">var lanes = [\"" + Lanes + "\"], laneLength = lanes.length, items = [" + HTML_EVENTS_ITEMS + "]"
-	HTML_EVENTS_TL += """ 
+	HTML_EVENTS_TL += """
 				timeBegin = \"Jan 1, 2013 00:00:00\",
 				timeEnd = \"Dec 31, 2013 23:59:59\";
 
@@ -1369,7 +1369,7 @@ def ParseEventLogs():
 						miniHeight = laneLength * 12 + 50,
 						mainHeight = h - miniHeight - 50;
 
-					//var parseDate = d3.time.format(\"%Y-%m-%d %H:%M:%S\").parse; //2013-05-22 15:00:00  
+					//var parseDate = d3.time.format(\"%Y-%m-%d %H:%M:%S\").parse; //2013-05-22 15:00:00
 					var parseDate = d3.time.format(\"%b %d, %Y %H:%M:%S\").parse; //Jun 13, 2013 20:07:09
 
 					//scales
@@ -1391,7 +1391,7 @@ def ParseEventLogs():
 								.attr(\"width\", w + m[1] + m[3])
 								.attr(\"height\", h + m[0] + m[2])
 								.attr(\"class\", \"chart\");
-					
+
 					chart.append(\"defs\").append(\"clipPath\")
 						.attr(\"id\", \"clip\")
 						.append(\"rect\")
@@ -1409,7 +1409,7 @@ def ParseEventLogs():
 								.attr(\"width\", w)
 								.attr(\"height\", miniHeight)
 								.attr(\"class\", \"mini\");
-					
+
 					//main lanes and texts
 					main.append(\"g\").selectAll(\".laneLines\")
 						.data(items)
@@ -1429,7 +1429,7 @@ def ParseEventLogs():
 						.attr(\"dy\", \".5ex\")
 						.attr(\"text-anchor\", \"end\")
 						.attr(\"class\", \"laneText\");
-					
+
 					//mini lanes and texts
 					mini.append(\"g\").selectAll(\".laneLines\")
 						.data(items)
@@ -1452,7 +1452,7 @@ def ParseEventLogs():
 
 					var itemRects = main.append(\"g\")
 										.attr(\"clip-path\", \"url(#clip)\");
-					
+
 					//mini item rects
 					mini.append(\"g\").selectAll(\"miniItems\")
 						.data(items)
@@ -1487,7 +1487,7 @@ def ParseEventLogs():
 						.attr(\"height\", miniHeight - 1);
 
 					display();
-					
+
 					function display() {
 						var rects, labels,
 							minExtent = brush.extent()[0],
@@ -1506,7 +1506,7 @@ def ParseEventLogs():
 						        .data(visItems, function(d) { return d.id; })
 							.attr(\"x\", function(d) {return x1(parseDate(d.start));})
 							.attr(\"width\", function(d) {return x1(parseDate(d.end)) - x1(parseDate(d.start));});
-						
+
 						rects.enter().append(\"rect\")
 							.attr(\"class\", function(d) {return \"miniItem\" + d.lane;})
 							.attr(\"x\", function(d) {return x1(parseDate(d.start));})
@@ -1528,7 +1528,7 @@ def ParseEventLogs():
 							.attr(\"text-anchor\", \"start\");
 
 						labels.exit().remove();
-					}	
+					}
 					</script>
 					"""
 
@@ -1575,7 +1575,7 @@ def Main():
 	if sys.version_info < (2, 7) or sys.version_info > (3, 0):
 		PrintAndLog(u"You must use python 2.7 or greater but not python 3", "ERROR")						# This error won't be logged
 		exit(1)
-		
+
 	if options.RootPath:
 		ROOT_PATH = options.RootPath
 
@@ -1584,7 +1584,7 @@ def Main():
 
 	if options.SyslogServer:
 		SyslogSetup(options.SyslogServer)
-	
+
 	if options.HTMLLogFile:
 		try:
 			HTML_LOG_FILE = codecs.open(options.HTMLLogFile, 'w', "utf-8")
@@ -1595,10 +1595,10 @@ def Main():
 			HTML_LOG_FILE = False
 
 	PrintAndLog("Header", "SECTION")
-	
+
 	AuditedSystemVersion = GetAuditedSystemVersion()
 	Timezone = GetAuditedSystemTimezone()
-	
+
 	PrintAndLog(u"Report generated by " + __description__ + " v" + __version__ + " on " + time.strftime('%x %X %Z') +" running as "+Euid +"/"+ Egid, "DEBUG")
 	PrintAndLog(u"Audited system path: " + ROOT_PATH.decode("utf-8"), "DEBUG")
 	PrintAndLog(u"Version of the audited system: " + AuditedSystemVersion, "DEBUG")
@@ -1616,25 +1616,25 @@ def Main():
 
 	if options.installedapps or options.all:
 		ParseInstalledApps()
-		
-	if options.quarantines or options.all:	
+
+	if options.quarantines or options.all:
 		ParseQuarantines()
 
 	if options.downloads or options.all:
 		ParseDownloads()
-		
+
 	if options.browsers or options.all:
 		ParseBrowsers()
-	
+
 	if options.wifiapgeolocate:
 		GEOLOCATE_WIFI_AP = True
 
 	if options.airportprefs or options.all:
 		ParseAirportPrefs()
-	
+
 	if options.usersaccounts or options.all:
 		ParseUsersAccounts()
-	
+
 	if options.eventlogs or options.all:
 		ParseEventLogs()
 
@@ -1655,12 +1655,12 @@ def Main():
 			VTLookup()
 		else:
 			PrintAndLog(u"VT_API_KEY is not set. Skipping VirusTotal lookup.", "ERROR")
-	
+
 	if options.LocalDatabase:
 		LocalLookup(options.LocalDatabase)
-	
+
 	if options.HTMLLogFile:
 		HTMLLogFlush()
-	
+
 if __name__ == '__main__':
 	Main()
