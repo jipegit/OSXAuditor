@@ -20,9 +20,9 @@ It extracts:
  * the WiFi access points the audited system has been connected to (and tries to geolocate them)
 
 It also looks for suspicious keywords in the .plist themselves.
- 
+
 It can verify the reputation of each file on:
- * Team Cymru's MHR 
+ * Team Cymru's MHR
  * VirusTotal
  * Malware.lu
  * your own local database
@@ -39,7 +39,7 @@ Finally, the results can be:
 
 ## Author
 
-Jean-Philippe Teissier - @Jipe_ 
+Jean-Philippe Teissier - @Jipe_
 
 ## How to install
 
@@ -48,7 +48,7 @@ Just copy all files from github
 ## Dependencies
 
 If you plan to run OS X Auditor on a Mac, you will get a full plist parsing support with the OS X Foundation through pyobjc:
- * pip install pyobjc 
+ * pip install pyobjc
 
 If you can't install pyobjc or if you plan to run OS X Auditor on another OS than Mac OS X, you may experience some troubles with the plist parsing:
  * pip install biplist
@@ -78,17 +78,17 @@ eg. [sudo] python osxauditor.py -a -m -l localhashes.db -H log.html
  * NEW: extracts the LastSession from Safari artifacts
  * NEW: extract system groups and users details
  * FIX: wrong os.path.join() calls
- * FIX: bug in the recursive ParsePackagesDir() 
+ * FIX: bug in the recursive ParsePackagesDir()
 
 ### 0.3.1
  * NEW: provides with the system name, version and build of the audited system
  * NEW: ability to analyze installed Applications (-i/--installedapps)
- * NEW: extracts the Archived History from Google Chrome artifacts 
+ * NEW: extracts the Archived History from Google Chrome artifacts
  * NEW: a human readable HTML log report :)
  * FIX: HTMLLog() and SYSLOGLog() now handle exceptions
  * FIX: ParsePackagesDir() is now recursive and only tries to parse apps or kernel extensions. Some DEBUG output added as well
  * FIX: HUGE UTF-8/UNICODE improvement
- * FIX: .DS_Store and .localized files are ignored in ParsePackagesDir() 
+ * FIX: .DS_Store and .localized files are ignored in ParsePackagesDir()
 
 ### 0.3
  * NEW: ability to parse Google Chrome artifacts (History and archives history, Cookies, Login Data, Top Sites, Web Data, HTML5 databases and local storage) with -b/--browsers
@@ -99,12 +99,12 @@ eg. [sudo] python osxauditor.py -a -m -l localhashes.db -H log.html
  * FIX: better identify md5 in the HTML output
  * CHANGE: indicates if a section (Startup items, Packages directory, Db tables, etc…) is empty to clarify the output
  * CHANGE: the downloads artifacts (-d/--downloads) include the old and new Mail.app default download directories
- 
+
 ### 0.2.1
  * CHANGE/FIX: implement a BigFileMd5() function to hash very big files, avoid MemoryError execptions and reduce the memory footprint
  * FIX: UTF-8 entries from LSQuarantineEvent in ParseQuarantines()
 
-### 0.2 
+### 0.2
  * NEW: ability to send the results to a remote syslogd server (-S)
  * NEW: ability to create a zipball of all the log files found on the audited system (-z)
  * CHANGE: the analysis of startup artifacts includes the old and deprecated StartupItems
@@ -114,7 +114,7 @@ eg. [sudo] python osxauditor.py -a -m -l localhashes.db -H log.html
  * CHANGE: some changes in the options parameters (-t, -l)
  * CHANGE: license changed from CC to GPL
  * CHANGE: debug levels are now more consitent in the output logs
- * CHANGE: a small change with the Bootstrap CSS 
+ * CHANGE: a small change with the Bootstrap CSS
  * CHANGE: the VirusTotal lookup is now done in a bulk mode
  * FIX: a bug in ParseLaunchAgents() on plist files containing both Program and ProgramArguments keys
 
@@ -209,7 +209,7 @@ https://code.google.com/p/volafox/
 
 ### Mandiant Memoryze(tm) for the Mac
 
-Memoryze for the Mac is free memory forensic software that helps incident responders find evil in memory… on Macs. 
+Memoryze for the Mac is free memory forensic software that helps incident responders find evil in memory… on Macs.
 Memoryze for the Mac can acquire and/or analyze memory images.  Analysis can be performed on offline memory images or on live systems.
 
 http://www.mandiant.com/resources/download/mac-memoryze
