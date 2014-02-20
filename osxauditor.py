@@ -61,8 +61,8 @@ import re
 import bz2
 import binascii
 
-MALWARE_LU_API_KEY = ""											#Put your malware.lu API key here
-VT_API_KEY  = u""												#Put your VirusTotal API key here
+MALWARE_LU_API_KEY = os.getenv('MALWARE_LU_APT_KEY', False)
+VT_API_KEY  = os.getenv('VT_API_KEY', False)
 
 try:
 	from urllib.request import urlopen							#python3
