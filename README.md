@@ -69,10 +69,10 @@ eg. [sudo -E] python osxauditor.py -a -m -l localhashes.db -H log.html
 
 ### Setting Environment Variables
 
-VirusTotal:
+[VirusTotal API](https://www.virustotal.com/en/documentation/public-api/):
 > export VT_API_KEY=aaaabbbbccccddddeeee
 
-Malware.lu:
+Malware.lu API Key:
 > export MALWARE_LU_API_KEY=aaaabbbbccccddddeeee
 
 ## Changelog
