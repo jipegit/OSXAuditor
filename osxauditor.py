@@ -9,7 +9,7 @@
 
 __description__ = 'OS X Auditor'
 __author__ = '@Jipe_'
-__version__ = '0.4.1'
+__version__ = '0.4.2'
 
 ROOT_PATH = "/"
 HOSTNAME = ""
