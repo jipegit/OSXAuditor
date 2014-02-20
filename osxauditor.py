@@ -36,13 +36,11 @@ MRH_HOST = u"hash.cymru.com"
 MRH_PORT = 43
 
 MALWARE_LU_HOST = u"https://www.malware.lu/api/check"
-MALWARE_LU_API_KEY = ""											#Put your malware.lu API key here
 
 GEOLOCATE_WIFI_AP = False
 GEOMENA_API_HOST = u"http://geomena.org/ap/"
 
 VT_HOST = u"https://www.virustotal.com/vtapi/v2/file/report"
-VT_API_KEY  = u""												#Put your VirusTotal API key here
 
 ADMINS = []
 
@@ -62,6 +60,9 @@ from functools import partial
 import re
 import bz2
 import binascii
+
+MALWARE_LU_API_KEY = ""											#Put your malware.lu API key here
+VT_API_KEY  = u""												#Put your VirusTotal API key here
 
 try:
 	from urllib.request import urlopen							#python3
