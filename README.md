@@ -61,10 +61,19 @@ These dependencies will be removed when a working native plist module will be av
  * OS X Auditor runs well with python >= 2.7.2 (2.7.5 is OK). It does not run with a different version of python yet (due to the plist nightmare)
  * OS X Auditor is written to work on Moutain Lion. It will do his best on older OS X versions.
  * You must run it as root (or via sudo) if you want to use is on a running system, otherwise it won't be able to access some system and other users' files
+ * If you're using API keys from environment variables (see below), you need to use the ```sudo -E``` to use the users environment variables
 
 Type osxauditor.py -h to get all the available options, then run it with the selected options
 
-eg. [sudo] python osxauditor.py -a -m -l localhashes.db -H log.html
+eg. [sudo -E] python osxauditor.py -a -m -l localhashes.db -H log.html
+
+### Setting Environment Variables
+
+VirusTotal:
+> export VT_API_KEY=aaaabbbbccccddddeeee
+
+Malware.lu:
+> export MALWARE_LU_API_KEY=aaaabbbbccccddddeeee
 
 ## Changelog
 
