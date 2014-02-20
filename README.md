@@ -77,6 +77,9 @@ Malware.lu API Key:
 
 ## Changelog
 
+### 0.4.2
+ * Moved API keys from in the code to environment variables
+
 ### 0.4.1
  * CHANGE: Search for generic backdoors in LaunchAgentPlist
 
