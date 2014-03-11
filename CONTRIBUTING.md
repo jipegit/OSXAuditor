@@ -21,13 +21,13 @@ Here are some core ideas to keep in mind for contributing to OSXAuditor
 ### Submitting Code
 If your changes need to be modified due to some reviews, it is less clutter to tweak an isolated feature branch and push it again.
 
-We love pull requests. Here's a quick guide:
+We welcome pull requests. Here's a quick guide:
 
 1. Fork the repo.
 
 2. Create a feature branch.
 
-3. Build build build!!!
+3. Build.
 
 4. Push to your fork and submit a pull request.
 
