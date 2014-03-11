@@ -5,13 +5,13 @@ This page describes how to contribute changes to OSXAuditor.
 Please do **not** create a pull request without reading this guide first. Failure to do so may result in the **rejection** of the pull request.
 
 ## Philosophy
-Here are some core ideas to keep in mind for contributing to OSXAuditor:
-* must be as handy as possible for the Responder
-* don't need tons of libs to work
-* must work properly on either live or dead os x system (ie. hard drive copy)
-* everything must go through the printandlog() function so that people can add new output format easily
-* all the hases go into the global hash db
-* feel free to add any other external malware db
+Here are some core ideas to keep in mind for contributing to OSXAuditor
+
+* At it's core OSXAuditor must be as handy as possible for the Responder.
+* OSXAuditor is most effective and helpful if it can run on a stock system without installing any additional tools.
+* Must work properly on either live or dead os x system (ie. hard drive copy).
+* All output must go through the printandlog() function so that people can add new output format easily.
+* All the hases go into the global hash db.
 
 ## Submitting to OSXAuditor
 
