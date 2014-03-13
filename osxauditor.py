@@ -46,6 +46,8 @@ VT_API_KEY  = u""                                               #Put your VirusT
 
 ADMINS = []
 
+OSX_VERSION = []
+
 import optparse
 import os
 import sys
@@ -62,6 +64,7 @@ from functools import partial
 import re
 import bz2
 import binascii
+import platform
 
 try:
     from urllib.request import urlopen                          #python3
@@ -1184,6 +1187,8 @@ def ParseInstalledApps():
 def GetAuditedSystemVersion():
     """ Simply return the system version """
 
+    global OSX_VERSION
+
     SysVersion = "Unknown system version"
     SystemVersionPlist = False
 
@@ -1193,6 +1198,15 @@ def GetAuditedSystemVersion():
         if "ProductName" in SystemVersionPlist: SysVersion = SystemVersionPlist["ProductName"]
         if "ProductVersion" in SystemVersionPlist: SysVersion += " " + SystemVersionPlist["ProductVersion"]
         if "ProductBuildVersion" in SystemVersionPlist: SysVersion += " build " + SystemVersionPlist["ProductBuildVersion"]
+
+        OSX_VERSION = {
+			"ProductBuildVersion": SystemVersionPlist["ProductBuildVersion"],
+			"ProductVersion": SystemVersionPlist["ProductVersion"],
+			"MajorVersion": int(SystemVersionPlist["ProductVersion"].split('.')[0]),
+			"MinorVersion": int(SystemVersionPlist["ProductVersion"].split('.')[1]),
+			"PatchVersion": int(SystemVersionPlist["ProductVersion"].split('.')[2])
+		}
+
     else:
         PrintAndLog(u"Cannot determine the system version", "ERROR")
 
@@ -1543,6 +1557,7 @@ def Main():
     global HTML_LOG_FILE
     global HOSTNAME
     global GEOLOCATE_WIFI_AP
+    global OSX_VERSION
 
     HOSTNAME = socket.gethostname()
     Euid = str(os.geteuid())
