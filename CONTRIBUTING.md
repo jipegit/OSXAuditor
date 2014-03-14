@@ -40,7 +40,7 @@ Some things that will increase the chance that your pull request is accepted,:
 
 ### Syntax
 
-* Two spaces, no tabs.
+* Four spaces, no tabs.
 * No trailing whitespace.
 * Prefer &&/|| over and/or.
 * a = b and not a=b.
