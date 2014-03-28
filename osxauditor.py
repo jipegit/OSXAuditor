@@ -434,7 +434,8 @@ def ParseQuarantines():
             for LSQuarantineEvent in LSQuarantineEvents:
                 JointLSQuarantineEvent = u""
                 for Q in LSQuarantineEvent:
-                    JointLSQuarantineEvent += u";" + unicode(Q)
+                    decoded = str(Q).decode("UTF-8", "ignore")
+                    JointLSQuarantineEvent += u";" + decoded
                 PrintAndLog(JointLSQuarantineEvent[1:] + u"\n".decode("utf-8"), "INFO")
             DbConnection.close()
 
