@@ -950,23 +950,31 @@ def ParseAirportPrefs():
         if "RememberedNetworks" in AirportPrefPlist:
             RememberedNetworks = AirportPrefPlist["RememberedNetworks"]
             for RememberedNetwork in RememberedNetworks:
-            if OSX_VERSION["MinorVersion"] <= 8: # 10.8 or lower
-                Geolocation = "N/A (Geolocation disabled)"
-					if GEOLOCATE_WIFI_AP:
-						Geolocation = GeomenaApiLocation(RememberedNetwork["CachedScanRecord"]["BSSID"])
-					PrintAndLog(u"SSID: " + RememberedNetwork["SSIDString"].decode("utf-8") + u" - BSSID: " + RememberedNetwork["CachedScanRecord"]["BSSID"] + u" - RSSI: " + str(RememberedNetwork["CachedScanRecord"]["RSSI"]) + u" - Last connected: " + str(RememberedNetwork["LastConnected"]) + u" - Security type: " +  RememberedNetwork["SecurityType"] + u" - Geolocation: " + Geolocation, "INFO")
-					print "OSX 10.9 Airport Object"
+                if OSX_VERSION["MinorVersion"] <= 8: # 10.8 or lower
+                    Geolocation = "N/A (Geolocation disabled)"
+                    if GEOLOCATE_WIFI_AP:
+                        Geolocation = GeomenaApiLocation(RememberedNetwork["CachedScanRecord"]["BSSID"])
+                        PrintAndLog(
+                            u"SSID: " + RememberedNetwork["SSIDString"].decode("utf-8") +
+                            u" - BSSID: " + RememberedNetwork["CachedScanRecord"]["BSSID"] +
+                            u" - RSSI: " + str(RememberedNetwork["CachedScanRecord"]["RSSI"]) +
+                            u" - Last connected: " + str(RememberedNetwork["LastConnected"]) +
+                            u" - Security type: " + str(RememberedNetwork["SecurityType"]) +
+                            u" - Geolocation: " + Geolocation, "INFO")
 
-				elif OSX_VERSION["MinorVersion"] >= 9: # 10.9 or higher
-					Geolocation = "N/A (Geolocation disabled)"
-					if GEOLOCATE_WIFI_AP:
-						Geolocation = GeomenaApiLocation(RememberedNetwork["SSID"])
+                elif OSX_VERSION["MinorVersion"] >= 9: # 10.9 or higher
+                    Geolocation = "N/A (Geolocation disabled)"
+                    if GEOLOCATE_WIFI_AP:
+                        Geolocation = GeomenaApiLocation(RememberedNetwork["SSID"])
 
-					PrintAndLog(u"SSID: " + RememberedNetwork["SSIDString"].decode("utf-8") + u" - Closed: " + str(RememberedNetwork["Closed"]) + u" - Security type: " +  RememberedNetwork["SecurityType"] + u" - Geolocation: " + Geolocation, "INFO")
-
-				else:
+                    PrintAndLog(
+                        u"SSID: " + RememberedNetwork["SSIDString"].decode("utf-8") +
+                        u" - Closed: " + str(RememberedNetwork["Closed"]) +
+                        u" - Security type: " +  str(RememberedNetwork["SecurityType"]) +
+                        u" - Geolocation: " + Geolocation, "INFO")
+                else:
 					PrintAndLog("No Airport Preferences File Detected", "ERROR")
-			else:
+                #else:
                 NbAirportPrefs += 1
 
     if NbAirportPrefs == 0:
