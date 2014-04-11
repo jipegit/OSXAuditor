@@ -40,8 +40,9 @@ Some things that will increase the chance that your pull request is accepted,:
 
 ### Syntax
 
-* Two spaces, no tabs.
+* Four spaces, no tabs.
 * No trailing whitespace.
 * Prefer &&/|| over and/or.
 * a = b and not a=b.
 * Follow the conventions you see used in the source already.
+* When in doubt default to [PEP 8 -- Style Guide for Python Code](http://legacy.python.org/dev/peps/pep-0008/).
