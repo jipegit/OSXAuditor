@@ -46,6 +46,8 @@ VT_API_KEY  = u""                                               #Put your VirusT
 
 ADMINS = []
 
+OSX_VERSION = []
+
 import optparse
 import os
 import sys
@@ -62,6 +64,7 @@ from functools import partial
 import re
 import bz2
 import binascii
+import platform
 
 try:
     from urllib.request import urlopen                          #python3
@@ -947,10 +950,31 @@ def ParseAirportPrefs():
         if "RememberedNetworks" in AirportPrefPlist:
             RememberedNetworks = AirportPrefPlist["RememberedNetworks"]
             for RememberedNetwork in RememberedNetworks:
-                Geolocation = "N/A (Geolocation disabled)"
-                if GEOLOCATE_WIFI_AP:
-                    Geolocation = GeomenaApiLocation(RememberedNetwork["CachedScanRecord"]["BSSID"])
-                PrintAndLog(u"SSID: " + RememberedNetwork["SSIDString"].decode("utf-8") + u" - BSSID: " + RememberedNetwork["CachedScanRecord"]["BSSID"] + u" - RSSI: " + str(RememberedNetwork["CachedScanRecord"]["RSSI"]) + u" - Last connected: " + str(RememberedNetwork["LastConnected"]) + u" - Security type: " + RememberedNetwork["SecurityType"] + u" - Geolocation: " + Geolocation, "INFO")
+                if OSX_VERSION["MinorVersion"] <= 8: # 10.8 or lower
+                    Geolocation = "N/A (Geolocation disabled)"
+                    if GEOLOCATE_WIFI_AP:
+                        Geolocation = GeomenaApiLocation(RememberedNetwork["CachedScanRecord"]["BSSID"])
+                        PrintAndLog(
+                            u"SSID: " + RememberedNetwork["SSIDString"].decode("utf-8") +
+                            u" - BSSID: " + RememberedNetwork["CachedScanRecord"]["BSSID"] +
+                            u" - RSSI: " + str(RememberedNetwork["CachedScanRecord"]["RSSI"]) +
+                            u" - Last connected: " + str(RememberedNetwork["LastConnected"]) +
+                            u" - Security type: " + str(RememberedNetwork["SecurityType"]) +
+                            u" - Geolocation: " + Geolocation, "INFO")
+
+                elif OSX_VERSION["MinorVersion"] >= 9: # 10.9 or higher
+                    Geolocation = "N/A (Geolocation disabled)"
+                    if GEOLOCATE_WIFI_AP:
+                        Geolocation = GeomenaApiLocation(RememberedNetwork["SSID"])
+
+                    PrintAndLog(
+                        u"SSID: " + RememberedNetwork["SSIDString"].decode("utf-8") +
+                        u" - Closed: " + str(RememberedNetwork["Closed"]) +
+                        u" - Security type: " +  str(RememberedNetwork["SecurityType"]) +
+                        u" - Geolocation: " + Geolocation, "INFO")
+                else:
+					PrintAndLog("No Airport Preferences File Detected", "ERROR")
+                #else:
                 NbAirportPrefs += 1
 
     if NbAirportPrefs == 0:
@@ -1184,6 +1208,8 @@ def ParseInstalledApps():
 def GetAuditedSystemVersion():
     """ Simply return the system version """
 
+    global OSX_VERSION
+
     SysVersion = "Unknown system version"
     SystemVersionPlist = False
 
@@ -1193,6 +1219,15 @@ def GetAuditedSystemVersion():
         if "ProductName" in SystemVersionPlist: SysVersion = SystemVersionPlist["ProductName"]
         if "ProductVersion" in SystemVersionPlist: SysVersion += " " + SystemVersionPlist["ProductVersion"]
         if "ProductBuildVersion" in SystemVersionPlist: SysVersion += " build " + SystemVersionPlist["ProductBuildVersion"]
+
+        OSX_VERSION = {
+			"ProductBuildVersion": SystemVersionPlist["ProductBuildVersion"],
+			"ProductVersion": SystemVersionPlist["ProductVersion"],
+			"MajorVersion": int(SystemVersionPlist["ProductVersion"].split('.')[0]),
+			"MinorVersion": int(SystemVersionPlist["ProductVersion"].split('.')[1]),
+			"PatchVersion": int(SystemVersionPlist["ProductVersion"].split('.')[2])
+		}
+
     else:
         PrintAndLog(u"Cannot determine the system version", "ERROR")
 
@@ -1543,6 +1578,7 @@ def Main():
     global HTML_LOG_FILE
     global HOSTNAME
     global GEOLOCATE_WIFI_AP
+    global OSX_VERSION
 
     HOSTNAME = socket.gethostname()
     Euid = str(os.geteuid())
