@@ -1220,12 +1220,14 @@ def GetAuditedSystemVersion():
         if "ProductVersion" in SystemVersionPlist: SysVersion += " " + SystemVersionPlist["ProductVersion"]
         if "ProductBuildVersion" in SystemVersionPlist: SysVersion += " build " + SystemVersionPlist["ProductBuildVersion"]
 
+        ProductVersion = SystemVersionPlist["ProductVersion"].split('.')
+
         OSX_VERSION = {
 			"ProductBuildVersion": SystemVersionPlist["ProductBuildVersion"],
 			"ProductVersion": SystemVersionPlist["ProductVersion"],
-			"MajorVersion": int(SystemVersionPlist["ProductVersion"].split('.')[0]),
-			"MinorVersion": int(SystemVersionPlist["ProductVersion"].split('.')[1]),
-			"PatchVersion": int(SystemVersionPlist["ProductVersion"].split('.')[2])
+			"MajorVersion": int(ProductVersion[0]),
+			"MinorVersion": int(ProductVersion[1]),
+			"PatchVersion": int(ProductVersion[2] if len(ProductVersion) > 2 else 0)
 		}
 
     else:
