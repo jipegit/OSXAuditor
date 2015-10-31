@@ -11,7 +11,7 @@ Here are some core ideas to keep in mind for contributing to OSXAuditor
 * OSXAuditor is most effective and helpful if it can run on a stock system without installing any additional tools.
 * Must work properly on either live or dead os x system (ie. hard drive copy).
 * All output must go through the printandlog() function so that people can add new output format easily.
-* All the hases go into the global hash db.
+* All the hashes go into the global hash db.
 
 ## Submitting to OSXAuditor
 

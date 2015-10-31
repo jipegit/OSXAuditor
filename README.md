@@ -43,28 +43,28 @@ Jean-Philippe Teissier - @Jipe_
 
 ## How to install
 
-Just copy all files from github
+Just copy all files from GitHub.
 
 ## Dependencies
 
 If you plan to run OS X Auditor on a Mac, you will get a full plist parsing support with the OS X Foundation through pyobjc:
- * pip install pyobjc
+ * `pip install pyobjc`
 
 If you can't install pyobjc or if you plan to run OS X Auditor on another OS than Mac OS X, you may experience some troubles with the plist parsing:
- * pip install biplist
- * pip install plist
+ * `pip install biplist`
+ * `pip install plist`
 
 These dependencies will be removed when a working native plist module will be available in python
 
 ## How to run
 
  * OS X Auditor runs well with python >= 2.7.2 (2.7.5 is OK). It does not run with a different version of python yet (due to the plist nightmare)
- * OS X Auditor is written to work on Moutain Lion. It will do his best on older OS X versions.
+ * OS X Auditor is written to work on Mountain Lion. It will do its best on older OS X versions.
  * You must run it as root (or via sudo) if you want to use is on a running system, otherwise it won't be able to access some system and other users' files
 
-Type osxauditor.py -h to get all the available options, then run it with the selected options
+Type `osxauditor.py -h` to get all the available options, then run it with the selected options
 
-eg. [sudo] python osxauditor.py -a -m -l localhashes.db -H log.html
+eg. `[sudo] python osxauditor.py -a -m -l localhashes.db -H log.html`
 
 ## Changelog
 
