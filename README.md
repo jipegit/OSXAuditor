@@ -80,7 +80,7 @@ eg. `[sudo -E] python osxauditor.py -a -m -l localhashes.db -H log.html`
 ## Changelog
 
 ### 0.4.3
-* FIX: (lot of) Bug fixes  - See https://github.com/jipegit/OSXAuditor/issues
+* FIX: (lots of) Bug fixes  - See https://github.com/jipegit/OSXAuditor/issues
 * CHANGE: Malware.lu hash check removed - service not available anymore
 
 ### 0.4.2
