@@ -2,14 +2,14 @@
 #
 #  OS X Auditor
 #
-#  Author: Jean-Philippe Teissier ( @Jipe_ )
+#  Author: Jean-Philippe Teissier ( @Jipe_ ) & al.
 #
 #  This work is licensed under the GNU General Public License
 #
 
 __description__ = 'OS X Auditor'
-__author__ = '@Jipe_'
-__version__ = '0.4.2'
+__author__ = '@Jipe_ & al.'
+__version__ = '0.4.3'
 
 ROOT_PATH = "/"
 HOSTNAME = ""
@@ -34,8 +34,6 @@ SYSLOG_PORT = 514                                               #You can change 
 
 MRH_HOST = u"hash.cymru.com"
 MRH_PORT = 43
-
-MALWARE_LU_HOST = u"https://www.malware.lu/api/check"
 
 GEOLOCATE_WIFI_AP = False
 GEOMENA_API_HOST = u"http://geomena.org/ap/"
@@ -67,7 +65,6 @@ import bz2
 import binascii
 import platform
 
-MALWARE_LU_API_KEY = os.getenv('MALWARE_LU_APT_KEY', False)
 VT_API_KEY  = os.getenv('VT_API_KEY', False)
 
 try:
@@ -283,32 +280,6 @@ def MHRLookup():
             PrintAndLog(line.decode("utf-8"), "INFO")
         else:
             PrintAndLog(line.decode("utf-8"), "WARNING")
-
-def MlwrluLookup():
-    """ Perform of lookup in Malware.lu database """
-
-    PrintAndLog(u"Malware.lu lookup", "SECTION")
-    PrintAndLog(u"Got %s hashes to verify" % len(HASHES), "DEBUG")
-
-    for Hash in HASHES:
-        try:
-            Params = { 'hash': Hash, 'apikey': MALWARE_LU_API_KEY }
-            UrlEncodedParams = urllib.urlencode(Params)
-            F = urllib2.urlopen(MALWARE_LU_HOST, UrlEncodedParams)
-            Data = F.read()
-
-        except (urllib2.HTTPError, e):
-            if e.code == 401:
-                PrintAndLog(u"Wrong Malware.lu api key", "ERROR")
-            else:
-                PrintAndLog(u"Malware.lu error " + str(e.code) + " " + str(e.reason).decode("utf-8"), "ERROR")
-
-        Ret = json.loads(Data)
-
-        if Ret["status"]:
-            PrintAndLog(Hash + u" " + u"N/A "+ Ret["stats"], "WARNING")
-        else:
-            PrintAndLog(Hash + u" " + Ret["stats"] + u" " + Ret["error"], "INFO")
 
 def VTLookup():
     """ Perform of lookup in VirusTotal database """
@@ -552,7 +523,7 @@ def ParseStartup():
             PrintAndLog(LoginItemsPlistPath, "DEBUG")
             LoginItemsPlist = UniversalReadPlist(LoginItemsPlistPath)
 
-            if "SessionItems" in LoginItemsPlist:
+            if LoginItemsPlist and "SessionItems" in LoginItemsPlist:
                 CustomListItems = LoginItemsPlist["SessionItems"]["CustomListItems"]
                 for CustomListItem in CustomListItems:
                     PrintAndLog(CustomListItem["Name"].decode("utf-8") + u" - " + binascii.hexlify(CustomListItem["Alias"]).decode("hex").decode("utf-8", "ignore"), "INFO")
@@ -718,7 +689,7 @@ def ParseSafariProfile(User, Path):
     PrintAndLog(LastSessionPlistPath.decode("utf-8"), "DEBUG")
     LastSessionPlist = UniversalReadPlist(LastSessionPlistPath)
 
-    if "SessionWindows" in LastSessionPlist:
+    if LastSessionPlist and "SessionWindows" in LastSessionPlist:
 	try:
         	LastSession = LastSessionPlist["SessionWindows"][0]["TabStates"][0]
         	PrintAndLog(LastSession["TabURL"].decode("utf-8") + u" - " + binascii.hexlify(LastSession["SessionState"]).decode("hex").decode("utf-8", "ignore"), "INFO")
@@ -863,7 +834,7 @@ def ParsePackagesDir(PackagesDirPath):
                         PrintAndLog(u"Cannot find the CFBundleExecutable key in " + PackagePlistPath.decode("utf-8") + u"\n", "ERROR")
             NbPackages += 1
 
-            if os.path.isdir(os.path.join(PackagesDirPath, PackagePath)):
+            if os.path.isdir(os.path.join(PackagesDirPath, PackagePath)) and not os.path.islink(os.path.join(PackagesDirPath, PackagePath)):
                 ParsePackagesDir(os.path.join(PackagesDirPath, PackagePath))
 
         else: continue
@@ -899,6 +870,10 @@ def AggregateLogs(ZipLogsFile):
     """ Walk in the different log directories to add all logs to a zipball """
 
     PrintAndLog(u"Log files aggregation", "SECTION")
+    
+    if not os.path.isdir(ZipLogsFile):
+        os.makedirs(ZipLogsFile)
+
     ZipLogsFilePath = os.path.join(ZipLogsFile, "OSXAuditor_report_" + HOSTNAME + "_" + time.strftime("%Y%m%d-%H%M%S", time.gmtime()) + ".zip")
     PrintAndLog(u"All log files are aggregated in " + ZipLogsFilePath.decode("utf-8"), "DEBUG")
 
@@ -959,38 +934,14 @@ def ParseAirportPrefs():
     AirportPrefPlist = UniversalReadPlist(AirportPrefPlistPath)
 
     if AirportPrefPlist:
-        if "RememberedNetworks" in AirportPrefPlist:
-            RememberedNetworks = AirportPrefPlist["RememberedNetworks"]
-            for RememberedNetwork in RememberedNetworks:
-                if OSX_VERSION["MinorVersion"] <= 8: # 10.8 or lower
-                    Geolocation = u"N/A (Geolocation disabled)"
-                    if GEOLOCATE_WIFI_AP:
-                        Geolocation = GeomenaApiLocation(RememberedNetwork["CachedScanRecord"]["BSSID"])
-                        PrintAndLog(
-                            u"SSID: " + RememberedNetwork["SSIDString"].decode("utf-8") +
-                            u" - BSSID: " + RememberedNetwork["CachedScanRecord"]["BSSID"] +
-                            u" - RSSI: " + str(RememberedNetwork["CachedScanRecord"]["RSSI"]) +
-                            u" - Last connected: " + str(RememberedNetwork["LastConnected"]) +
-                            u" - Security type: " + str(RememberedNetwork["SecurityType"]) +
-                            u" - Geolocation: " + Geolocation, "INFO")
-
-                elif OSX_VERSION["MinorVersion"] >= 9: # 10.9 or higher
-                    Geolocation = u"N/A (Geolocation disabled)"
-                    if GEOLOCATE_WIFI_AP:
-                        Geolocation = GeomenaApiLocation(RememberedNetwork["SSID"])
-
-                    try:
-                        PrintAndLog(
-                            "SSID: " + RememberedNetwork["SSIDString"].decode("ascii", 'ignore') +
-                            u" - Closed: " + str(RememberedNetwork["Closed"]) +
-                            u" - Security type: " +  str(RememberedNetwork["SecurityType"]) +
-                            u" - Geolocation: " + Geolocation, "INFO")
-                    except UnicodeDecodeError:
-			print repr("DEBUG: " + RememberedNetwork["SSIDString"])
-
+        if "KnownNetworks" in AirportPrefPlist:
+            KnownNetworks = AirportPrefPlist["KnownNetworks"]
+            for KnownNetwork in KnownNetworks:              #TODO: Add ChannelHistory
+                if GEOLOCATE_WIFI_AP:
+                    Geolocation = GeomenaApiLocation(KnownNetworks[KnownNetwork]["SSIDString"])
                 else:
-					PrintAndLog("No Airport Preferences File Detected", "ERROR")
-                #else:
+                    Geolocation = "N/A (Geolocation disabled)"
+                PrintAndLog(u"SSID: " + KnownNetworks[KnownNetwork]["SSIDString"].decode("utf-8") + u" - SSID: " + str(KnownNetworks[KnownNetwork]["SSID"]) + u" - Last connected: " + str(KnownNetworks[KnownNetwork]["LastConnected"]) + u" - Security type: " + KnownNetworks[KnownNetwork]["SecurityType"] + u" - Geolocation: " + Geolocation, "INFO")
                 NbAirportPrefs += 1
 
     if NbAirportPrefs == 0:
@@ -1040,7 +991,7 @@ def ParseMailAppAccount(MailAccountPlistPath):
                     if "SSLEnabled" in DeliveryAccount: DAccountPref += "SSLEnabled: " + DeliveryAccount["SSLEnabled"] + " - "
                     if "Username" in DeliveryAccount: DAccountPref += "Username: " + DeliveryAccount["Username"]  + " - "
                     if "Hostname" in DeliveryAccount: DAccountPref += "Hostname: " + DeliveryAccount["Hostname"]  + " - "
-                    if "PortNumber" in DeliveryAccount: DAccountPref += "(" + MailAccount["PortNumber"]  + ") - "
+                    if "PortNumber" in DeliveryAccount: DAccountPref += "(" + str(MailAccount["PortNumber"])  + ") - "
                     PrintAndLog(DAccountPref.decode("utf-8"), "INFO")
                 NbSmtpAccounts += 1
             if NbSmtpAccounts == 0:
@@ -1620,7 +1571,6 @@ def Main():
     Parser.add_option('-U', '--usersaccounts', action="store_true", default=False, help='Analyze users\' accounts ')
     Parser.add_option('-e', '--eventlogs', action="store_true", default=False, help='Analyze system event logs')
     Parser.add_option('-m', '--mrh', action="store_true", default=False, help='Perform a reputation lookup in Team Cymru\'s MRH')
-    Parser.add_option('-u', '--malwarelu', action="store_true", default=False, help='Perform a reputation lookup in Malware.lu database')
     Parser.add_option('-v', '--virustotal', action="store_true", default=False, help='Perform a lookup in VirusTotal database.')
     Parser.add_option('-l', '--localhashesdb', dest="LocalDatabase", default=False, help='Path to a local database of suspicious hashes to perform a lookup in')
 
@@ -1697,12 +1647,6 @@ def Main():
 
     if options.mrh:
         MHRLookup()
-
-    if options.malwarelu:
-        if MALWARE_LU_API_KEY:
-            MlwrluLookup()
-        else:
-            PrintAndLog(u"MALWARE_LU_API_KEY is not set. Skipping Malware.lu lookup.", "ERROR")
 
     if options.virustotal:
         if VT_API_KEY:

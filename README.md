@@ -24,7 +24,6 @@ It also looks for suspicious keywords in the .plist themselves.
 It can verify the reputation of each file on:
  * Team Cymru's MHR
  * VirusTotal
- * Malware.lu
  * your own local database
 
 It can aggregate all logs from the following directories into a zipball:
@@ -43,7 +42,7 @@ Jean-Philippe Teissier - @Jipe_ & al.
 
 ## Support
 
-OS X Auditor started as a week-end project and is now barely maintained. It and has been forked by the great guys @ Yelp who created osxcollector.
+OS X Auditor started as a week-end project and is now barely maintained. It has been forked by the great guys @ Yelp who created osxcollector.
 
 If you are looking for a production / corporate solution I do recommend you to move to osxcollector (https://github.com/Yelp/osxcollector)
 
@@ -64,8 +63,8 @@ These dependencies will be removed when a working native plist module will be av
 
 ## How to run
 
- * OS X Auditor runs well with python >= 2.7.2 (2.7.5 is OK). It does not run with a different version of python yet (due to the plist nightmare)
- * OS X Auditor is written to work on Mountain Lion. It will do its best on older OS X versions.
+ * OS X Auditor runs well with python >= 2.7.2 (2.7.9 is OK). It does not run with a different version of python yet (due to the plist nightmare)
+ * OS X Auditor is maintained to work on the lastest OS X version. It will do its best on older OS X versions.
  * You must run it as root (or via sudo) if you want to use is on a running system, otherwise it won't be able to access some system and other users' files
  * If you're using API keys from environment variables (see below), you need to use the ```sudo -E``` to use the users environment variables
 
@@ -78,13 +77,14 @@ eg. `[sudo -E] python osxauditor.py -a -m -l localhashes.db -H log.html`
 [VirusTotal API](https://www.virustotal.com/en/documentation/public-api/):
 > export VT_API_KEY=aaaabbbbccccddddeeee
 
-Malware.lu API Key:
-> export MALWARE_LU_API_KEY=aaaabbbbccccddddeeee
-
 ## Changelog
 
+### 0.4.3
+* FIX: (lot of) Bug fixes  - See https://github.com/jipegit/OSXAuditor/issues
+* CHANGE: Malware.lu hash check removed - service not available anymore
+
 ### 0.4.2
- * Moved API keys from in the code to environment variables
+ * CHANGE: Moved API keys from in the code to environment variables
 
 ### 0.4.1
  * CHANGE: Search for generic backdoors in LaunchAgentPlist
