@@ -39,7 +39,13 @@ Finally, the results can be:
 
 ## Author
 
-Jean-Philippe Teissier - @Jipe_
+Jean-Philippe Teissier - @Jipe_ & al.
+
+## Support
+
+OS X Auditor started as a week-end project and is now barely maintained. It and has been forked by the great guys @ Yelp who created osxcollector.
+
+If you are looking for a production / corporate solution I do recommend you to move to osxcollector (https://github.com/Yelp/osxcollector)
 
 ## How to install
 
@@ -61,12 +67,24 @@ These dependencies will be removed when a working native plist module will be av
  * OS X Auditor runs well with python >= 2.7.2 (2.7.5 is OK). It does not run with a different version of python yet (due to the plist nightmare)
  * OS X Auditor is written to work on Mountain Lion. It will do its best on older OS X versions.
  * You must run it as root (or via sudo) if you want to use is on a running system, otherwise it won't be able to access some system and other users' files
+ * If you're using API keys from environment variables (see below), you need to use the ```sudo -E``` to use the users environment variables
 
 Type `osxauditor.py -h` to get all the available options, then run it with the selected options
 
-eg. `[sudo] python osxauditor.py -a -m -l localhashes.db -H log.html`
+eg. `[sudo -E] python osxauditor.py -a -m -l localhashes.db -H log.html`
+
+### Setting Environment Variables
+
+[VirusTotal API](https://www.virustotal.com/en/documentation/public-api/):
+> export VT_API_KEY=aaaabbbbccccddddeeee
+
+Malware.lu API Key:
+> export MALWARE_LU_API_KEY=aaaabbbbccccddddeeee
 
 ## Changelog
+
+### 0.4.2
+ * Moved API keys from in the code to environment variables
 
 ### 0.4.1
  * CHANGE: Search for generic backdoors in LaunchAgentPlist
@@ -221,7 +239,7 @@ https://code.google.com/p/volatility/wiki/MacMemoryForensics
 ## License
 
 OS X Auditor
-Copyright (C) 2013 Jean-Philippe Teissier
+Copyright (C) 2013-2015 Jean-Philippe Teissier
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

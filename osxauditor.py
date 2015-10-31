@@ -9,7 +9,7 @@
 
 __description__ = 'OS X Auditor'
 __author__ = '@Jipe_'
-__version__ = '0.4.1'
+__version__ = '0.4.2'
 
 ROOT_PATH = "/"
 HOSTNAME = ""
@@ -36,13 +36,11 @@ MRH_HOST = u"hash.cymru.com"
 MRH_PORT = 43
 
 MALWARE_LU_HOST = u"https://www.malware.lu/api/check"
-MALWARE_LU_API_KEY = ""                                         #Put your malware.lu API key here
 
 GEOLOCATE_WIFI_AP = False
 GEOMENA_API_HOST = u"http://geomena.org/ap/"
 
 VT_HOST = u"https://www.virustotal.com/vtapi/v2/file/report"
-VT_API_KEY  = u""                                               #Put your VirusTotal API key here
 
 ADMINS = []
 
@@ -68,6 +66,9 @@ import re
 import bz2
 import binascii
 import platform
+
+MALWARE_LU_API_KEY = os.getenv('MALWARE_LU_APT_KEY', False)
+VT_API_KEY  = os.getenv('VT_API_KEY', False)
 
 try:
     from urllib.request import urlopen                          #python3
