@@ -48,9 +48,12 @@ ADMINS = []
 
 OSX_VERSION = []
 
+import sys
+reload(sys)
+sys.setdefaultencoding("UTF8")
+
 import optparse
 import os
-import sys
 import hashlib
 import logging
 from logging.handlers import SysLogHandler
@@ -715,15 +718,20 @@ def ParseSafariProfile(User, Path):
     LastSessionPlist = UniversalReadPlist(LastSessionPlistPath)
 
     if "SessionWindows" in LastSessionPlist:
-        LastSession = LastSessionPlist["SessionWindows"][0]["TabStates"][0]
-        PrintAndLog(LastSession["TabURL"].decode("utf-8") + u" - " + binascii.hexlify(LastSession["SessionState"]).decode("hex").decode("utf-8", "ignore"), "INFO")
+	try:
+        	LastSession = LastSessionPlist["SessionWindows"][0]["TabStates"][0]
+        	PrintAndLog(LastSession["TabURL"].decode("utf-8") + u" - " + binascii.hexlify(LastSession["SessionState"]).decode("hex").decode("utf-8", "ignore"), "INFO")
+	except:
+        	PrintAndLog("EXCEPTION on LastSession for Safari !!! ", "INFO")
 
 
 
     PrintAndLog(User + u"\'s Safari databases", "SUBSECTION")
-    for Db in os.listdir(os.path.join(Path, "Databases")):
-        DumpSQLiteDb(os.path.join(Path, "Databases", Db))
-        NbFiles += 1
+    NbFile = 0
+    if os.path.isfile(os.path.join(Path, "Databases")):
+        for Db in os.listdir(os.path.join(Path, "Databases")):
+            DumpSQLiteDb(os.path.join(Path, "Databases", Db))
+            NbFiles += 1
 
     if  NbFiles == 0:
         PrintAndLog(User + u"\'s Safari databases is empty", "INFO")
@@ -731,9 +739,11 @@ def ParseSafariProfile(User, Path):
     NbFile = 0
 
     PrintAndLog(User + u"\'s Safari LocalStorage", "SUBSECTION")
-    for Db in os.listdir(os.path.join(Path, "LocalStorage")):
-        DumpSQLiteDb(os.path.join(Path, "LocalStorage", Db))
-        NbFiles += 1
+    if os.path.isfile(os.path.join(Path, "LocalStorage")):
+        for Db in os.listdir(os.path.join(Path, "LocalStorage")):
+	     if os.path.isfile(os.path.join(Path, "LocalStorage", Db)):
+                 DumpSQLiteDb(os.path.join(Path, "LocalStorage", Db))
+                 NbFiles += 1
 
     if  NbFiles == 0:
         PrintAndLog(User + u"\'s Safari LocalStorage is empty", "INFO")
@@ -888,7 +898,7 @@ def AggregateLogs(ZipLogsFile):
     """ Walk in the different log directories to add all logs to a zipball """
 
     PrintAndLog(u"Log files aggregation", "SECTION")
-    ZipLogsFilePath = os.path.join(ZipLogsFile, "OSXAuditor_report_", HOSTNAME, "_", time.strftime("%Y%m%d-%H%M%S", time.gmtime()), ".zip")
+    ZipLogsFilePath = os.path.join(ZipLogsFile, "OSXAuditor_report_" + HOSTNAME + "_" + time.strftime("%Y%m%d-%H%M%S", time.gmtime()) + ".zip")
     PrintAndLog(u"All log files are aggregated in " + ZipLogsFilePath.decode("utf-8"), "DEBUG")
 
     try:
@@ -952,7 +962,7 @@ def ParseAirportPrefs():
             RememberedNetworks = AirportPrefPlist["RememberedNetworks"]
             for RememberedNetwork in RememberedNetworks:
                 if OSX_VERSION["MinorVersion"] <= 8: # 10.8 or lower
-                    Geolocation = "N/A (Geolocation disabled)"
+                    Geolocation = u"N/A (Geolocation disabled)"
                     if GEOLOCATE_WIFI_AP:
                         Geolocation = GeomenaApiLocation(RememberedNetwork["CachedScanRecord"]["BSSID"])
                         PrintAndLog(
@@ -964,15 +974,19 @@ def ParseAirportPrefs():
                             u" - Geolocation: " + Geolocation, "INFO")
 
                 elif OSX_VERSION["MinorVersion"] >= 9: # 10.9 or higher
-                    Geolocation = "N/A (Geolocation disabled)"
+                    Geolocation = u"N/A (Geolocation disabled)"
                     if GEOLOCATE_WIFI_AP:
                         Geolocation = GeomenaApiLocation(RememberedNetwork["SSID"])
 
-                    PrintAndLog(
-                        u"SSID: " + RememberedNetwork["SSIDString"].decode("utf-8") +
-                        u" - Closed: " + str(RememberedNetwork["Closed"]) +
-                        u" - Security type: " +  str(RememberedNetwork["SecurityType"]) +
-                        u" - Geolocation: " + Geolocation, "INFO")
+                    try:
+                        PrintAndLog(
+                            "SSID: " + RememberedNetwork["SSIDString"].decode("ascii", 'ignore') +
+                            u" - Closed: " + str(RememberedNetwork["Closed"]) +
+                            u" - Security type: " +  str(RememberedNetwork["SecurityType"]) +
+                            u" - Geolocation: " + Geolocation, "INFO")
+                    except UnicodeDecodeError:
+			print repr("DEBUG: " + RememberedNetwork["SSIDString"])
+
                 else:
 					PrintAndLog("No Airport Preferences File Detected", "ERROR")
                 #else:
@@ -1004,7 +1018,7 @@ def ParseMailAppAccount(MailAccountPlistPath):
                     if "SSLEnabled" in MailAccount: MAccountPref += "SSLEnabled: " + MailAccount["SSLEnabled"] + " - "
                     if "Username" in MailAccount: MAccountPref += "Username: " + MailAccount["Username"]  + " - "
                     if "Hostname" in MailAccount: MAccountPref += "Hostname: " + MailAccount["Hostname"]  + " - "
-                    if "PortNumber" in MailAccount: MAccountPref += "(" + MailAccount["PortNumber"]  + ") - "
+                    if "PortNumber" in MailAccount: MAccountPref += "(" + str(MailAccount["PortNumber"])  + ") - "
                     if "SMTPIdentifier" in MailAccount: MAccountPref += "SMTPIdentifier: " + MailAccount["SMTPIdentifier"]  + " - "
                     if "EmailAddresses" in MailAccount:
                         for EmailAddresse in MailAccount["EmailAddresses"]:
