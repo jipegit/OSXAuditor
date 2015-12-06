@@ -357,36 +357,36 @@ def BigFileMd5(FilePath):
 def UniversalReadPlist(PlistPath):
     ''' Try to read a plist depending of the plateform and the available libs. Good luck Jim... '''
 
-    plistDictionnary = False
+    plistDictionary = False
 
     if FOUNDATION_IS_IMPORTED:
         plistNSData, errorMessage = Foundation.NSData.dataWithContentsOfFile_options_error_(PlistPath, Foundation.NSUncachedRead, None)
         if errorMessage is not None or plistNSData is None:
             PrintAndLog(u'Unable to read in the data from the plist file: ' + PlistPath.decode('utf-8'), 'ERROR')
-        plistDictionnary, plistFormat, errorMessage = Foundation.NSPropertyListSerialization.propertyListFromData_mutabilityOption_format_errorDescription_(plistNSData, Foundation.NSPropertyListMutableContainers, None, None)
-        if errorMessage is not None or plistDictionnary is None:
+        plistDictionary, plistFormat, errorMessage = Foundation.NSPropertyListSerialization.propertyListFromData_mutabilityOption_format_errorDescription_(plistNSData, Foundation.NSPropertyListMutableContainers, None, None)
+        if errorMessage is not None or plistDictionary is None:
             PrintAndLog(u'Unable to read in the data from the plist file: ' + PlistPath.decode('utf-8'), 'ERROR')
-        if not hasattr(plistDictionnary, 'has_key'):
+        if not hasattr(plistDictionary, 'has_key'):
             PrintAndLog(u'The plist does not have a dictionary as its root as expected: ' + PlistPath.decode('utf-8'), 'ERROR')
-        return plistDictionnary
+        return plistDictionary
     else:
         if BIPLIST_IS_IMPORTED:
             try:
-                plistDictionnary = biplist.readPlist(PlistPath)
+                plistDictionary = biplist.readPlist(PlistPath)
             except (IOError):
                 PrintAndLog (u'Cannot open ' + PlistPath.decode('utf-8') , 'ERROR')
             except:
                 PrintAndLog(u'Cannot parse ' + PlistPath.decode('utf-8') + u' (Binary or JSON plist may FAIL) \n', 'ERROR')
-            return plistDictionnary
+            return plistDictionary
 
         elif PLISTLIB_IS_IMPORTED:
             try:
-                plistDictionnary = plistlib.readPlist(PlistPath)
+                plistDictionary = plistlib.readPlist(PlistPath)
             except (IOError):
                 PrintAndLog (u'Cannot open ' + PlistPath.decode('utf-8') , 'ERROR')
             except:
                 PrintAndLog(u'Cannot parse ' + PlistPath.decode('utf-8') + u' (Binary or JSON plist may FAIL) \n', 'ERROR')
-            return plistDictionnary
+            return plistDictionary
         else:
             PrintAndLog(u'Cannot parse ' + PlistPath.decode('utf-8') + u'. No plist lib available.\n', 'ERROR')
             return None
