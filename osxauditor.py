@@ -10,7 +10,7 @@
 
 __description__ = 'OS X Auditor'
 __author__ = '@Jipe_ & al.'
-__version__ = '0.4.3'
+__version__ = '0.4.4'
 
 ROOT_PATH = '/'
 HOSTNAME = ''
@@ -943,7 +943,16 @@ def ParseAirportPrefs():
                     Geolocation = GeomenaApiLocation(KnownNetworks[KnownNetwork]['SSIDString'])
                 else:
                     Geolocation = 'N/A (Geolocation disabled)'
-                PrintAndLog(u'SSID: ' + KnownNetworks[KnownNetwork]['SSIDString'].decode('utf-8') + u' - SSID: ' + str(KnownNetworks[KnownNetwork]['SSID']) + u' - Last connected: ' + str(KnownNetworks[KnownNetwork]['LastConnected']) + u' - Security type: ' + KnownNetworks[KnownNetwork]['SecurityType'] + u' - Geolocation: ' + Geolocation, 'INFO')
+                
+                print sys.getsizeof(KnownNetworks[KnownNetwork]['SSID'])
+                AirportPref = u'SSID: ' + KnownNetworks[KnownNetwork]['SSIDString'].decode('utf-8') + u' - SSID: ' + str(KnownNetworks[KnownNetwork]['SSID'])
+                
+                if KnownNetworks[KnownNetwork]['LastConnected']:
+                    AirportPref = AirportPref + u' - Last connected: '+ str(KnownNetworks[KnownNetwork]['LastConnected'])
+                
+                AirportPref = AirportPref + u' - Security type: ' + KnownNetworks[KnownNetwork]['SecurityType'] + u' - Geolocation: ' + Geolocation
+                
+                PrintAndLog(AirportPref, 'INFO')
                 NbAirportPrefs += 1
 
     if NbAirportPrefs == 0:
