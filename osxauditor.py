@@ -1002,7 +1002,7 @@ def ParseMailAppAccount(MailAccountPlistPath):
                     if 'SSLEnabled' in DeliveryAccount: DAccountPref += 'SSLEnabled: ' + DeliveryAccount['SSLEnabled'] + ' - '
                     if 'Username' in DeliveryAccount: DAccountPref += 'Username: ' + DeliveryAccount['Username']  + ' - '
                     if 'Hostname' in DeliveryAccount: DAccountPref += 'Hostname: ' + DeliveryAccount['Hostname']  + ' - '
-                    if 'PortNumber' in DeliveryAccount: DAccountPref += '(' + str(MailAccount['PortNumber'])  + ') - '
+                    if 'PortNumber' in DeliveryAccount: DAccountPref += '(' + str(DeliveryAccount['PortNumber'])  + ') - '
                     PrintAndLog(DAccountPref.decode('utf-8'), 'INFO')
                 NbSmtpAccounts += 1
             if NbSmtpAccounts == 0:
