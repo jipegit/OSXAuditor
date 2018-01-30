@@ -40,6 +40,10 @@ Finally, the results can be:
 
 Jean-Philippe Teissier - @Jipe_ & al.
 
+## Development status
+
+**OS X Auditor is no longer maintained**
+
 ## Support
 
 OS X Auditor started as a week-end project and is now barely maintained. It has been forked by the great guys @ Yelp who created osxcollector.
