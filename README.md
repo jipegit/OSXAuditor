@@ -42,13 +42,13 @@ Jean-Philippe Teissier - @Jipe_ & al.
 
 ## Development status
 
-**OS X Auditor is no longer maintained**
+**OS X Auditor IS NO LONGER MAINTAINED - YOU SHOULD NOT USE IT** 
 
 ## Support
 
-OS X Auditor started as a week-end project and is now barely maintained. It has been forked by the great guys @ Yelp who created osxcollector.
+OS X Auditor started as a week-end project and is no longer maintained. It has been forked by the great guys @ Yelp who created osxcollector.
 
-If you are looking for a production / corporate solution I do recommend you to move to osxcollector (https://github.com/Yelp/osxcollector)
+I do recommend you to use to osxcollector (https://github.com/Yelp/osxcollector)
 
 ## How to install
 
