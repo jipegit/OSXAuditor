@@ -1,5 +1,8 @@
 # OS X Auditor
 
+![Maintenance](https://img.shields.io/badge/Maintained%3F-no-red.svg)
+![No Maintenance Intended](http://unmaintained.tech/badge.svg)
+
 OS X Auditor is a free Mac OS X computer forensics tool.
 
 OS X Auditor parses and hashes the following artifacts on the running system or a copy of a system you want to analyze:
